@@ -4,7 +4,7 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
-
+import path from 'path';
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { ...verifyData } = req.body;
   const result = await AuthService.verifyEmailToDB(verifyData);
@@ -19,11 +19,16 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const {...userData } = req.body;
-  const fileName= req.file?.filename
-  console.log(fileName);
   
-
-  const result = await UserService.createUserToDB(userData);
+  const files:any=req.files
+  const fileName= files.image[0].filename
+  const filePath = path.join(process.cwd(), 'uploads', fileName)
+  const userDetails = {
+    ...userData,
+    image:fileName?filePath:"",
+    birth_year:Number(userData.birth_year),
+  }
+  const result = await UserService.createUserToDB(userDetails);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -40,7 +45,11 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'User logged in successfully.',
-    data: result.createToken,
+    data: {
+      accessToken: result.createToken,
+      refreshToken: result.refreshToken,
+
+    },
   });
 });
 
@@ -105,6 +114,23 @@ const matchOtpFromPhone = catchAsync(async (req: Request, res: Response) =>{
   })
 })
 
+//refresh token controller
+
+const refreshToken = catchAsync(async (req: Request, res: Response) => {
+  const refreshToken = req.body.refreshToken;
+  const result = await AuthService.refreshAccessTokenDB(refreshToken);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Token refreshed successfully.',
+    data: {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    },
+  });
+});
+
 export const AuthController = {
   verifyEmail,
   loginUser,
@@ -114,4 +140,5 @@ export const AuthController = {
   registerUser,
   sendOtpToPhone,
   matchOtpFromPhone,
+  refreshToken,
 };

@@ -29,11 +29,14 @@ resetTokenSchema.statics.isExistToken = async (
 //token validity check
 resetTokenSchema.statics.isExpireToken = async (token: string) => {
   const currentDate = new Date();
+ 
   const resetToken = await ResetToken.findOne({
     token,
     expireAt: { $gt: currentDate },
   });
-  return !!resetToken;
+  
+  
+  return resetToken?true: false;
 };
 
 export const ResetToken = model<IResetToken, ResetTokenModel>(

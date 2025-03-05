@@ -5,12 +5,15 @@ import validateRequest from '../../middlewares/validateRequest';
 import { AuthController } from './auth.controller';
 import { AuthValidation } from './auth.validation';
 import fileUploadHandler from '../../middlewares/fileUploadHandler';
+import multer from 'multer';
 const router = express.Router();
+const upload = multer()
 
+// Register Request Should be as FormData
 router.post(
   '/register',
-  validateRequest(AuthValidation.createRegisterZodSchema),
   fileUploadHandler(),
+  validateRequest(AuthValidation.createRegisterZodSchema),
   AuthController.registerUser
 );
 
@@ -48,5 +51,6 @@ router.post(
 router.post('/send-otp',validateRequest(AuthValidation.sendOtpZodSchema),AuthController.sendOtpToPhone)
 
 router.post('/verify-otp',validateRequest(AuthValidation.matchOtpZodSchema),AuthController.matchOtpFromPhone)
+router.post('/refresh-token',validateRequest(AuthValidation.createRefreshTokenZodSchema), AuthController.refreshToken)
 
 export const AuthRoutes = router;

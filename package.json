@@ -35,29 +35,18 @@
     "colors": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-<<<<<<< HEAD
     "express": "^4.21.2",
-=======
-    "express": "^4.19.2",
->>>>>>> bbb41e1324af89dc863eb4142e65b574676ff298
     "http-status-codes": "^2.3.0",
     "i": "^0.3.7",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-<<<<<<< HEAD
     "nodemailer": "^6.10.0",
     "npm": "^11.1.0",
     "socket.io": "^4.8.1",
-    "winston": "^3.17.0",
-=======
-    "nodemailer": "^6.9.14",
-    "npm": "^10.8.1",
-    "socket.io": "^4.7.5",
     "twilio": "^5.4.5",
-    "winston": "^3.13.0",
->>>>>>> bbb41e1324af89dc863eb4142e65b574676ff298
+    "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^3.24.2"
   }

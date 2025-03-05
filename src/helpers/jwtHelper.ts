@@ -1,6 +1,6 @@
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
 
-const createToken = (payload: object, secret: Secret, expireTime: string) => {
+const createToken = (payload: object, secret: Secret, expireTime: number) => {
   return jwt.sign(payload, secret, { expiresIn: expireTime })
 };
 

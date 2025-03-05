@@ -54,7 +54,7 @@ const createRegisterZodSchema = z.object({
     expat_status:z.string({ required_error: 'Status is required'}),
     residing_country:z.string({ required_error: 'residing_country is required'}).optional(),
     ethnicity:z.string({ required_error: 'ethnicity is required'}).optional(),
-    birth_year:z.number({ required_error: 'BirthYear is required'}),
+    birth_year:z.string({ required_error: 'BirthYear is required'}),
   }),
 });
 
@@ -71,6 +71,12 @@ const matchOtpZodSchema = z.object({
   }),
 })
 
+const createRefreshTokenZodSchema = z.object({
+  body: z.object({
+    refreshToken: z.string({ required_error: 'Refresh Token is required' }),
+  }),
+})
+
 export const AuthValidation = {
   createVerifyEmailZodSchema,
   createForgetPasswordZodSchema,
@@ -80,4 +86,5 @@ export const AuthValidation = {
   createRegisterZodSchema,
   sendOtpZodSchema,
   matchOtpZodSchema,
+  createRefreshTokenZodSchema,
 };

@@ -18,7 +18,7 @@ import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
 import { phoneHelper } from '../../../helpers/phoneHelper';
 import { PhoneValidation } from '../phoneValidation/phoneValidation.model';
-
+import jwt from 'jsonwebtoken';
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
   const { email, password } = payload;
@@ -55,10 +55,20 @@ const loginUserFromDB = async (payload: ILoginData) => {
   const createToken = jwtHelper.createToken(
     { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
     config.jwt.jwt_secret as Secret,
-    config.jwt.jwt_expire_in as string
+    config.jwt.jwt_expire_in as number
   );
 
-  return { createToken };
+  const refreshToken = cryptoToken()
+
+  await ResetToken.deleteMany({ user: isExistUser._id });
+  ResetToken.create({
+    token:refreshToken,
+    user: isExistUser._id,
+    expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), //7 days
+  })
+  
+
+  return { createToken,refreshToken };
 };
 
 //forget password
@@ -286,6 +296,30 @@ const matchOtpFromDB = async (phone:string, otp:number)=>{
   return true
 }
 
+// Refresh Access Token
+  const refreshAccessTokenDB = async (token: string) => {
+    
+    const existToken = ResetToken.isExistToken(token);
+    if (!existToken) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid token');
+    }
+    const isExipire = ResetToken.isExpireToken(token);
+    if (!isExipire) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Token expired');
+    }
+    const leanUser = await ResetToken.findOne({token}).populate(["user"],['_id','email','role']).select('user')
+    const user:any = leanUser?.user;
+    if (!user) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'User not found');
+    }
+    const accessToken = jwt.sign({ id: user?._id, role: user?.role },config.jwt.jwt_secret!, { expiresIn:config.jwt.jwt_expire_in });
+    const refreshToken = cryptoToken()
+    await ResetToken.findOneAndUpdate({user:user._id}, {$set: {token: refreshToken, expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1)}})
+    return { accessToken, refreshToken };
+    
+    
+  };
+
 
 
 
@@ -298,4 +332,5 @@ export const AuthService = {
   changePasswordToDB,
   sendOtpToDB,
   matchOtpFromDB,
+  refreshAccessTokenDB
 };
