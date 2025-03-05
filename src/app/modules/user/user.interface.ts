@@ -16,6 +16,15 @@ export type IUser = {
     oneTimeCode: number;
     expireAt: Date;
   };
+  phone:string,
+  bio?:string;
+  expat_status: string;
+  country: string;
+  city: string;
+  residing_country: string;
+  ethnicity: string;
+  birth_year: number;
+  
 };
 
 export type UserModal = {

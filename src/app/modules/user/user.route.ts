@@ -23,11 +23,6 @@ router
     }
   );
 
-router
-  .route('/')
-  .post(
-    validateRequest(UserValidation.createUserZodSchema),
-    UserController.createUser
-  );
+
 
 export const UserRoutes = router;

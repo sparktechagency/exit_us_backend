@@ -41,10 +41,43 @@ const createChangePasswordZodSchema = z.object({
   }),
 });
 
+const createRegisterZodSchema = z.object({
+  body: z.object({
+    name: z.string({ required_error: 'Name is required' }),
+    email: z.string({ required_error: 'Email is required' }),
+    password: z.string({ required_error: 'Password is required' }),
+    image:z.string().optional(),
+    phone:z.string({ required_error: 'Phone is required'}),
+    city:z.string({ required_error: 'City is required'}),
+    country:z.string({ required_error: 'Country is required'}),
+    bio:z.string().optional(),
+    expat_status:z.string({ required_error: 'Status is required'}),
+    residing_country:z.string({ required_error: 'residing_country is required'}).optional(),
+    ethnicity:z.string({ required_error: 'ethnicity is required'}).optional(),
+    birth_year:z.number({ required_error: 'BirthYear is required'}),
+  }),
+});
+
+const sendOtpZodSchema = z.object({
+  body: z.object({
+    phone: z.string({ required_error: 'Phone is required' }),
+  }),
+})
+
+const matchOtpZodSchema = z.object({
+  body: z.object({
+    phone: z.string({ required_error: 'Phone is required' }),
+    otp: z.number({ required_error: 'OTP is required' }),
+  }),
+})
+
 export const AuthValidation = {
   createVerifyEmailZodSchema,
   createForgetPasswordZodSchema,
   createLoginZodSchema,
   createResetPasswordZodSchema,
   createChangePasswordZodSchema,
+  createRegisterZodSchema,
+  sendOtpZodSchema,
+  matchOtpZodSchema,
 };

@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
+import { UserService } from '../user/user.service';
 
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { ...verifyData } = req.body;
@@ -15,6 +16,21 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     data: result.data,
   });
 });
+
+const registerUser = catchAsync(async (req: Request, res: Response) => {
+  const {...userData } = req.body;
+  const fileName= req.file?.filename
+  console.log(fileName);
+  
+
+  const result = await UserService.createUserToDB(userData);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'User created successfully',
+    data: result,
+  });
+})
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { ...loginData } = req.body;
@@ -66,10 +82,36 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// send otp to phone number
+const sendOtpToPhone= catchAsync(async (req: Request, res: Response) => {
+  const { phone } = req.body;
+  await AuthService.sendOtpToDB(phone);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'OTP sent successfully.',
+    
+  })
+})
+
+// match otp from phone number
+const matchOtpFromPhone = catchAsync(async (req: Request, res: Response) =>{
+  const { phone, otp } = req.body;
+  await AuthService.matchOtpFromDB(phone, otp);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'OTP matched successfully.',
+  })
+})
+
 export const AuthController = {
   verifyEmail,
   loginUser,
   forgetPassword,
   resetPassword,
   changePassword,
+  registerUser,
+  sendOtpToPhone,
+  matchOtpFromPhone,
 };

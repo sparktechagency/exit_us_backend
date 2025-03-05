@@ -4,7 +4,15 @@ import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { AuthController } from './auth.controller';
 import { AuthValidation } from './auth.validation';
+import fileUploadHandler from '../../middlewares/fileUploadHandler';
 const router = express.Router();
+
+router.post(
+  '/register',
+  validateRequest(AuthValidation.createRegisterZodSchema),
+  fileUploadHandler(),
+  AuthController.registerUser
+);
 
 router.post(
   '/login',
@@ -36,5 +44,9 @@ router.post(
   validateRequest(AuthValidation.createChangePasswordZodSchema),
   AuthController.changePassword
 );
+
+router.post('/send-otp',validateRequest(AuthValidation.sendOtpZodSchema),AuthController.sendOtpToPhone)
+
+router.post('/verify-otp',validateRequest(AuthValidation.matchOtpZodSchema),AuthController.matchOtpFromPhone)
 
 export const AuthRoutes = router;
