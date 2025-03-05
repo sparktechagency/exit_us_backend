@@ -10,8 +10,14 @@ import { IUser } from './user.interface';
 import { User } from './user.model';
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
+
+  //validate email uniqueness
+  const isExistUser = await User.isExistUserByEmail(payload.email!);
+  if (isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exists');
+  }
+
   //set role
-  payload.role = USER_ROLES.USER;
   const createUser = await User.create(payload);
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');

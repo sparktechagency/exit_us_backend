@@ -16,6 +16,8 @@ import cryptoToken from '../../../util/cryptoToken';
 import generateOTP from '../../../util/generateOTP';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
+import { phoneHelper } from '../../../helpers/phoneHelper';
+import { PhoneValidation } from '../phoneValidation/phoneValidation.model';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -247,10 +249,53 @@ const changePasswordToDB = async (
   await User.findOneAndUpdate({ _id: user.id }, updateData, { new: true });
 };
 
+// Sending Otp To Phone Number
+const sendOtpToDB = async(phone:string)=>{
+  const otp = generateOTP()
+  const isExist = PhoneValidation.isExistPhone(phone);
+  if(!isExist){
+    await PhoneValidation.create({phone, otp, expireAt: new Date(Date.now() + 3 * 60000)})
+    const result = await phoneHelper.sendVerificationCode(phone,otp)
+  }else{
+    const isExpired = PhoneValidation.isExpiredOtp(phone);
+    if(isExpired){
+      await PhoneValidation.findOneAndUpdate({phone}, {otp, expireAt: new Date(Date.now() + 3 * 60000)})
+      const result = await phoneHelper.sendVerificationCode(phone, otp)
+    }else{
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Otp already sent, please wait 3 minutes')
+    }
+  }
+
+}
+
+// Match Otp From Phone Number
+const matchOtpFromDB = async (phone:string, otp:number)=>{
+  const isExist = await PhoneValidation.isExistPhone(phone);
+  if(!isExist){
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Phone number does not exist')
+  }
+  const isExpired = PhoneValidation.isExpiredOtp(phone);
+  if(isExpired){
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Otp expired, please request again')
+  }
+  const isMatch = await PhoneValidation.findOne({phone:phone, otp:otp})
+  if(!isMatch){
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Otp does not match')
+  }
+  await PhoneValidation.deleteOne({phone})
+  return true
+}
+
+
+
+
+
 export const AuthService = {
   verifyEmailToDB,
   loginUserFromDB,
   forgetPasswordToDB,
   resetPasswordToDB,
   changePasswordToDB,
+  sendOtpToDB,
+  matchOtpFromDB,
 };

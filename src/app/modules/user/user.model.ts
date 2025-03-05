@@ -15,7 +15,8 @@ const userSchema = new Schema<IUser, UserModal>(
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
-      required: true,
+      required: false,
+      default: USER_ROLES.USER,
     },
     email: {
       type: String,
@@ -59,6 +60,16 @@ const userSchema = new Schema<IUser, UserModal>(
       },
       select: 0,
     },
+    phone:{
+      type:String,
+      required: true,
+    },
+    bio: {
+      type: String,
+    },
+    expat_status:{
+      type:String
+    }
   },
   { timestamps: true }
 );
