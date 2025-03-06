@@ -52,5 +52,6 @@ router.post('/send-otp',validateRequest(AuthValidation.sendOtpZodSchema),AuthCon
 
 router.post('/verify-otp',validateRequest(AuthValidation.matchOtpZodSchema),AuthController.matchOtpFromPhone)
 router.post('/refresh-token',validateRequest(AuthValidation.createRefreshTokenZodSchema), AuthController.refreshToken)
+router.post('/reset-password-otp',validateRequest(AuthValidation.createResetPasswordUsingOtpZodSchema),AuthController.resetPasswordWithOtp)
 
 export const AuthRoutes = router;

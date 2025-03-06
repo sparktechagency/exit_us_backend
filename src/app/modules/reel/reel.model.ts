@@ -1,0 +1,31 @@
+import { model, Schema } from "mongoose";
+import {IReel,  ReelModel } from "./reel.interface";
+
+const reelSchema = new Schema<IReel,ReelModel>({
+    video_url: {
+        type: String,
+        required: false,
+        default: '' // temprorary optional field
+    },
+    caption: {
+        type: String,
+        default: ''
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    likes:{
+        type:Number,
+        default: 0
+    }
+},{
+    timestamps: true
+})
+
+export const Reel = model<IReel, ReelModel>("Reel", reelSchema);
+
+
+
+

@@ -214,6 +214,7 @@ const resetPasswordToDB = async (
   });
 };
 
+
 const changePasswordToDB = async (
   user: JwtPayload,
   payload: IChangePassword
@@ -258,6 +259,40 @@ const changePasswordToDB = async (
   };
   await User.findOneAndUpdate({ _id: user.id }, updateData, { new: true });
 };
+
+//reset password using email otp
+
+const resetPasswordByEmailOtpToDB = async (email: string, payload: IAuthResetPassword,otp:number) => {
+  if(payload.newPassword!== payload.confirmPassword){
+    throw new ApiError(StatusCodes.BAD_REQUEST, "New password and Confirm password doesn't match!")
+  }
+  const isExistUser = await User.findOne({ email }).select('+authentication');
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  if (!isExistUser.authentication?.oneTimeCode) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Please give the otp, check your email we send a code'
+    );
+  }
+  if (isExistUser.authentication?.oneTimeCode!== otp) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'You provided wrong otp');
+  }
+  const date = new Date();
+  if (date > isExistUser.authentication?.expireAt) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Otp already expired, Please try again'
+    );
+  }
+  
+  const hashPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+  await User.findOneAndUpdate({ _id: isExistUser._id }, { password: hashPassword }, { new: true });
+}
 
 // Sending Otp To Phone Number
 const sendOtpToDB = async(phone:string)=>{
@@ -332,5 +367,6 @@ export const AuthService = {
   changePasswordToDB,
   sendOtpToDB,
   matchOtpFromDB,
-  refreshAccessTokenDB
+  refreshAccessTokenDB,
+  resetPasswordByEmailOtpToDB
 };

@@ -19,10 +19,11 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const {...userData } = req.body;
-  
   const files:any=req.files
-  const fileName= files.image[0].filename
-  const filePath = path.join(process.cwd(), 'uploads', fileName)
+  const fileName=files?.image?.length? files.image[0].filename:""
+  const filePath = `/uploads/image/${fileName}`
+  if(files.image){}
+  
   const userDetails = {
     ...userData,
     image:fileName?filePath:"",
@@ -115,7 +116,6 @@ const matchOtpFromPhone = catchAsync(async (req: Request, res: Response) =>{
 })
 
 //refresh token controller
-
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const refreshToken = req.body.refreshToken;
   const result = await AuthService.refreshAccessTokenDB(refreshToken);
@@ -131,6 +131,17 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// reset password using otp
+  const resetPasswordWithOtp = catchAsync(async (req: Request, res: Response) => {
+    const { email, otp,confirmPassword,newPassword } = req.body;
+    await AuthService.resetPasswordByEmailOtpToDB(email,{ newPassword, confirmPassword},otp);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Your password has been successfully reset.',
+    });
+  });
+
 export const AuthController = {
   verifyEmail,
   loginUser,
@@ -141,4 +152,6 @@ export const AuthController = {
   sendOtpToPhone,
   matchOtpFromPhone,
   refreshToken,
+  resetPasswordWithOtp,
+
 };

@@ -77,6 +77,15 @@ const createRefreshTokenZodSchema = z.object({
   }),
 })
 
+const createResetPasswordUsingOtpZodSchema = z.object({
+  body: z.object({
+    email: z.string({ required_error: 'Email is required' }),
+    otp: z.number({ required_error: 'OTP is required' }),
+    newPassword: z.string({ required_error: 'New Password is required' }),
+    confirmPassword: z.string({ required_error: 'Confirm Password is required' }),
+  }),
+})
+
 export const AuthValidation = {
   createVerifyEmailZodSchema,
   createForgetPasswordZodSchema,
@@ -87,4 +96,5 @@ export const AuthValidation = {
   sendOtpZodSchema,
   matchOtpZodSchema,
   createRefreshTokenZodSchema,
+  createResetPasswordUsingOtpZodSchema,
 };

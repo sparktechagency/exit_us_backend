@@ -10,8 +10,8 @@ const createEvent = catchAsync(
         const eventData = req.body;
         const user:any = req.user;
         const files:any=req.files
-          const fileName= files.image[0].filename
-          const filePath = path.join(process.cwd(), 'uploads', fileName)
+        const fileName= files.image[0].filename
+        const filePath = path.join(process.cwd(), 'uploads', fileName)
 
         const result = await EventService.createEventToDB({...eventData, user:user.id,image: filePath});
         sendResponse(res, {

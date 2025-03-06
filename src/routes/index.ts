@@ -3,6 +3,8 @@ import { AuthRoutes } from '../app/modules/auth/auth.route';
 import { UserRoutes } from '../app/modules/user/user.route';
 import { EventRoutes } from '../app/modules/event/event.route';
 import { MeetupRoutes } from '../app/modules/meetup/meetup.route';
+import { ExperienceRoutes } from '../app/modules/experience/experience.route';
+import { ReelRoutes } from '../app/modules/reel/reel.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -21,6 +23,14 @@ const apiRoutes = [
   {
     path: '/meetup',
     route: MeetupRoutes,
+  },
+  {
+    path:"/experience",
+    route:ExperienceRoutes
+  },
+  {
+    path:"/reel",
+    route: ReelRoutes
   }
 ];
 
