@@ -5,6 +5,7 @@ import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import path from 'path';
+import { KysService } from './kyc.service';
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { ...verifyData } = req.body;
   const result = await AuthService.verifyEmailToDB(verifyData);
@@ -142,6 +143,19 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
     });
   });
 
+  const nidSubmit = catchAsync(async (req: Request, res: Response) => {
+    const files:any=req.files
+    const fileName=files?.image?.length? files.image[0].filename:""
+    const cropImageFrom = await KysService.detectAndLabelFaces(path.join(process.cwd(), 'uploads',"image", fileName));
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Your NID has been submitted successfully.',
+      data : cropImageFrom,
+    });
+  })
+
 export const AuthController = {
   verifyEmail,
   loginUser,
@@ -153,5 +167,6 @@ export const AuthController = {
   matchOtpFromPhone,
   refreshToken,
   resetPasswordWithOtp,
+  nidSubmit,
 
 };

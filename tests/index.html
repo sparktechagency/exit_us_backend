@@ -3,61 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chunked Video Upload Test</title>
+    <title>IP Webcam Stream</title>
 </head>
 <body>
-    <input type="file" id="videoInput">
-    <button onclick="uploadVideo()">Upload Video</button>
+    <h2>Live Stream from Phone Camera</h2>
+    <button onclick="startStream()">Start Stream</button>
+    <video id="videoStream" autoplay playsinline></video>
 
     <script>
-        async function uploadVideo() {
-            const fileInput = document.getElementById("videoInput");
-            if (!fileInput.files.length) {
-                return alert("Please select a video file.");
-            }
-
-            const file = fileInput.files[0];
-            const chunkSize = 1024 * 1024 * 5; // 5MB chunks
-            const totalChunks = Math.ceil(file.size / chunkSize);
-            const uploadId = Date.now(); // Unique upload ID
-            const fileName = file.name.replace(/\s+/g, "_"); // Remove spaces in filename
-
-            for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-                const start = chunkIndex * chunkSize;
-                const end = Math.min(start + chunkSize, file.size);
-                const chunk = file.slice(start, end); // Extract chunk
-
-                const formData = new FormData();
-                formData.append("video", chunk);
-                formData.append("fileName", fileName);
-                formData.append("chunkIndex", chunkIndex);
-                formData.append("totalChunks", totalChunks);
-                formData.append("title", "Sample Caption"); // Replace with actual caption data
-                formData.append("description", "Sample Description"); //
-                console.log(formData);
-                
-                try {
-                    const response = await fetch("http://10.0.70.50:5000/api/v1/reel", {
-                        method: "POST",
-                        body: formData,
-                        headers:{
-
-                          // Required for binary data
-                    
-                          
-                            "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YzgzNGE3NTI3NDFhNWRmNTg3ODMzOSIsInJvbGUiOiJVU0VSIiwiZW1haWwiOiJtYXNvbTM0NTZAZ21haWwuY29tIiwiaWF0IjoxNzQxMTgwMTUwLCJleHAiOjE3NDEyNjY1NTB9.J4rHuTTBmTVHzPv0MQxSlR4hO7vlmjv6X9bsv-d-q_4",
-                            
-                        }
-                    });
-                    const result = await response.json();
-                    console.log(`Chunk ${chunkIndex + 1}/${totalChunks} uploaded`, result);
-                } catch (err) {
-                    console.error(`Error uploading chunk ${chunkIndex + 1}:`, err);
-                    return alert("Upload failed");
-                }
-            }
-
-            alert("Video upload completed!");
+        function startStream() {
+            const videoElement = document.getElementById("videoStream");
+            videoElement.src = "http://192.168.10.51:8080/video"; // Replace with your correct IP
+            videoElement.play().catch(error => console.error("Autoplay error:", error));
         }
     </script>
 </body>

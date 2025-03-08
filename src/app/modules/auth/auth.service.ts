@@ -344,12 +344,14 @@ const matchOtpFromDB = async (phone:string, otp:number)=>{
     }
     const leanUser = await ResetToken.findOne({token}).populate(["user"],['_id','email','role']).select('user')
     const user:any = leanUser?.user;
+    console.log(user);
+    
     if (!user) {
       throw new ApiError(StatusCodes.UNAUTHORIZED, 'User not found');
     }
     const accessToken = jwt.sign({ id: user?._id, role: user?.role },config.jwt.jwt_secret!, { expiresIn:config.jwt.jwt_expire_in });
-    const refreshToken = cryptoToken()
-    await ResetToken.findOneAndUpdate({user:user._id}, {$set: {token: refreshToken, expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1)}})
+    const refreshToken = token
+    await ResetToken.findOneAndUpdate({user:user._id}, {$set: {token: refreshToken, expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1),}})
     return { accessToken, refreshToken };
     
     
