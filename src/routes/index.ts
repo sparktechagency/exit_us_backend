@@ -7,6 +7,7 @@ import { ExperienceRoutes } from '../app/modules/experience/experience.route';
 import { ReelRoutes } from '../app/modules/reel/reel.route';
 import { DonationRoute } from '../app/modules/donate/donate.route';
 import { TranslatorRoutes } from '../app/modules/translateor/translator.route';
+import { CountryRoutes } from '../app/modules/countrys/country.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -41,6 +42,10 @@ const apiRoutes = [
   {
     path:"/translator",
     route: TranslatorRoutes
+  },
+  {
+    path:"/country",
+    route: CountryRoutes
   }
 ];
 

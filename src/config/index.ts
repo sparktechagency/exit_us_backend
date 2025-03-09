@@ -27,5 +27,9 @@ export default {
     accountSid: process.env.TWILIO_ACCOUNT_SID,
     authToken: process.env.TWILIO_AUTH_TOKEN,
     fromPhone: process.env.TWILIO_FROM_PHONE,
+  },
+  geo:{
+    apiKey:process.env.GEO_API_KEY,
+    host:process.env.GEO_HOST
   }
 };

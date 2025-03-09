@@ -4,7 +4,7 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
-import path from 'path';
+import path, { join } from 'path';
 import { KysService } from './kyc.service';
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { ...verifyData } = req.body;
@@ -152,9 +152,26 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
       success: true,
       statusCode: StatusCodes.OK,
       message: 'Your NID has been submitted successfully.',
-      data : cropImageFrom,
     });
   })
+
+  const verificationFace = catchAsync(
+    async (req: Request, res: Response) => {
+    // const {image} = req.body // videos
+    const files:any=req.files
+    const fileName=files?.image?.length? files.image[0].filename:""
+    const image = path.join(process.cwd(), 'uploads',"image", fileName);
+    const match = await KysService.verifyFace(image)
+      sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Face verification successful.',
+        data:{
+          match
+        },
+      });
+    }
+  )
 
 export const AuthController = {
   verifyEmail,
@@ -168,5 +185,6 @@ export const AuthController = {
   refreshToken,
   resetPasswordWithOtp,
   nidSubmit,
+  verificationFace,
 
 };
