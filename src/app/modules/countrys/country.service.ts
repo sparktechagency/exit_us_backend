@@ -2,43 +2,90 @@ import wiki from "wikipedia";
 import { countriesHelper } from "../../../helpers/countrysHelper";
 import config from "../../../config";
 import axios from "axios";
+import path from "path";
+import catchAsync from "../../../shared/catchAsync";
+import { Move } from "../move/move.model";
 
-const topCountersOfWorld = async (amount:number=10)=>{
+const topCountersOfWorld = async (amount: number = 10) => {
     const response = await fetch("https://restcountries.com/v3.1/all");
-    const countries = await response.json();
+    const countries: any[] = await response.json();
 
-    const sortedCountries = countries
-      .map((c: any) => ({
-        name: c.name.common,
-        population: c.population,
-        flag: c.flags.png, // Image of the flag
-      }))
-      .sort((a:any, b:any) => b.population - a.population) // Sort by population (descending)
-      .slice(0, amount);// Get top 10
-      return sortedCountries;
+    // Fetch all existing destination countries in one query & convert to Set
+    const existingDestinations = new Set(
+        (await Move.find({}, { destinationCountry: 1, _id: 0 })).map(doc => doc.destinationCountry)
+    );
 
-}
+    // Function to fetch country details
+    const fetchCountryDetails = async (item: any) => {
+        const { population, flags, name } = item;
+        const flag = flags.png;
+        const countryName = name.common;
+
+        const image = (await wiki.images(countryName)).find(img => !img.url.endsWith(".svg"))?.url || "";
+
+        const movingPeople = await Move.countDocuments({ destinationCountry: countryName });
+
+        return { population, flag, image, name: countryName, movingPeople };
+    };
+
+    // Get countries that exist in the `Move` model
+    const existingCountries = await Promise.all(
+        countries.filter(item => existingDestinations.has(item.name.common)).map(fetchCountryDetails)
+    );
+
+    // Sort existing countries by people moving
+    existingCountries.sort((a, b) => b.movingPeople - a.movingPeople);
+
+    // Fill missing spots with top populated countries
+    const missingCount = amount - existingCountries.length;
+    const missingCountries = missingCount > 0
+        ? await Promise.all(
+            countries
+                .sort((a, b) => b.population - a.population)
+                .slice(0, missingCount)
+                .map(fetchCountryDetails)
+        )
+        : [];
+
+    // Return combined list
+    return [...existingCountries, ...missingCountries];
+};
+
 
 const topCountersOfRegions = async (region:string,amount:number=10) => {
     const response = await fetch(`https://restcountries.com/v3.1/region/${region}`);
     const countries = await response.json();
 
-    const sortedCountries = countries
-      .map((c: any) => ({
+    const sortedCountries =Promise.all(
+     countries
+      .map( async (c: any) => ({
         name: c.name.common,
         population: c.population,
+        image: (await wiki.images(c.name.common)).filter(item=>{
+            if(!item.url.endsWith(".svg")){
+                return item.url
+            }
+        })[0].url,
         flag: c.flags.png, // Flag image
       }))
+    
       .sort((a:any, b:any) => b.population - a.population) // Sort by highest population
-      .slice(0, amount); // Get top 10
+      .slice(0, amount)
+     ) // Get top 10
       return sortedCountries;
+    
 }
 
 const singleCountriesDetails = async (query:any)=>{
     const lat = query?.latitude
     const long = query?.longitude
     const response = await wiki.page(query.country)
-    const images = (await response.images()).map(item=>item.url)
+    const images = (await response.images()).map(item=>{
+        const extname = path.extname(item.url)
+        if(extname!=='.svg'){
+            return item.url
+        }
+    })
     const details = await response.summary()
     const country = await countriesHelper.countryDetailsFromApi(query.country)
     const latlang:[number,number] = country.latlng || [0,0]
@@ -47,7 +94,7 @@ const singleCountriesDetails = async (query:any)=>{
         name: query.country,
         population: country.population,
         flag: country.flags.png,
-        image: images,
+        image: images.filter(item=>item!=null),
         details: details.extract,
         distanceInKm: distance.distance.toFixed(2),
         flightTime: distance.flightTime,

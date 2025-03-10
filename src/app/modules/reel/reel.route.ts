@@ -7,13 +7,14 @@ import validateRequest from '../../middlewares/validateRequest';
 import { ReelValidation } from './reel.validation';
 import auth from '../../middlewares/auth';
 import { USER_ROLES } from '../../../enums/user';
+import tempAuth from '../../middlewares/tempAuth';
 
 
 const router = express.Router();
 
 router.post('/',auth(USER_ROLES.USER),uploadChunkMiddleware,validateRequest(ReelValidation.createReelZodSchema),ReelController.postReel)
 
-router.get('/', ReelController.getReels)
+router.get('/',tempAuth(USER_ROLES.USER), ReelController.getReels)
 
 router.post('/like', auth(USER_ROLES.USER),validateRequest(ReelValidation.likeReelZodSchema), ReelController.likeReel)
 

@@ -30,7 +30,8 @@ const postReel = catchAsync(
 const getReels = catchAsync(
     async (req:Request, res:Response)=>{
         const query = req.query;
-        const reels = await ReelService.getAllReelsFromDB(query);
+        const user:any = req.user
+        const reels = await ReelService.getAllReelsFromDB(query,user.id);
         sendResponse(res, {
             success: true,
             statusCode: 200,

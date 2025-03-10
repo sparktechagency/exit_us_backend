@@ -38,11 +38,12 @@ const deleteReelToDB = async (reelId: Types.ObjectId, user:JwtPayload) => {
     return deleteReel;
 }
 
-const getAllReelsFromDB = async (query:Record<string,any>) => {
+const getAllReelsFromDB = async (query:Record<string,any>,user:Types.ObjectId|null=null) => {
     const result = new QueryBuilder(Reel.find({}), query).paginate().search(['video_url','caption'])
     const reels = await result.modelQuery.populate(['user'],['image','name','email','phone']).lean().exec();
     const reelsWithLikes = await Promise.all(reels.map(async (reel:any) => {
         reel.likes = await Like.countDocuments({ reel: reel._id }).exec();
+        reel.isILike = await Like.countDocuments({user,reel:reel._id})
         return reel;
     }))
     if (!reelsWithLikes) {

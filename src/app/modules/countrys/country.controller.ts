@@ -2,17 +2,21 @@ import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import { CountryService } from "./country.service";
 import sendResponse from "../../../shared/sendResponse";
+import { redisHelper } from "../../../helpers/redisHelper";
 
 const topCountersOfWorld = catchAsync(
     async (req:Request, res:Response) => {
+        const url = req.originalUrl
         const query:any = req.query
         const countries = await CountryService.topCountersOfWorld(query.amount!)
-        sendResponse(res, {
+        const response = {
             success: true,
             statusCode: 200,
             message: "Top countries retrieved successfully",
             data: countries
-        })
+        }
+        await redisHelper.set(url,response)
+        sendResponse(res,response )
     }
 )
 const topCountersOfRegions = catchAsync(
@@ -45,12 +49,14 @@ const citysOFCountries = catchAsync(
         const query = req.query
         const country = req.params.country
         const cities = await CountryService.getCitysByCountry(country,query)
-        sendResponse(res, {
+        const response = {
             success: true,
             statusCode: 200,
             message: "Citys of countries retrieved successfully",
             data: cities
-        })
+        }
+        await redisHelper.set(req.originalUrl,response)
+        sendResponse(res,response )
     }
 )
 export const CountryController={

@@ -31,5 +31,9 @@ export default {
   geo:{
     apiKey:process.env.GEO_API_KEY,
     host:process.env.GEO_HOST
+  },
+  redis:{
+    url:process.env.REDIS_URL,
+    token:process.env.REDIS_TOKEN
   }
 };
