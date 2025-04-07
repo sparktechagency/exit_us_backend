@@ -35,5 +35,9 @@ export default {
   redis:{
     url:process.env.REDIS_URL,
     token:process.env.REDIS_TOKEN
+  },
+  paypal:{
+    client_id: process.env.PAYPAL_CLIENT_ID,
+    client_secret: process.env.PAYPAL_CLIENT_SECRET,
   }
 };

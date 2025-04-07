@@ -1,43 +1,50 @@
-<video id="video" autoplay></video>
-<button id="startStopBtn">Start Streaming</button>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Real-time Voice Translator</h2>
+    <button id="start">Start</button>
+    <p><strong>Original:</strong> <span id="original"></span></p>
+    <p><strong>Translated:</strong> <span id="translated"></span></p>
+</body>
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 <script>
-    const video = document.getElementById("video");
-    let isStreaming = false;
-    let intervalId;
+const socket = io('http://10.0.70.50:5000');
+let audioContext, processor, input;
 
-    async function startWebcam() {
-        video.src = "http://192.168.10.50:8080/video"; // Replace with your phone's IP
-        video.play();
+document.getElementById('start').onclick = async () => {
+  socket.emit('start-stream');
+
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  audioContext = new AudioContext();
+  input = audioContext.createMediaStreamSource(stream);
+  processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+  input.connect(processor);
+  processor.connect(audioContext.destination);
+
+  processor.onaudioprocess = (e) => {
+    const inputData = e.inputBuffer.getChannelData(0);
+    const buffer = new ArrayBuffer(inputData.length * 2);
+    const view = new DataView(buffer);
+
+    for (let i = 0; i < inputData.length; i++) {
+      const sample = Math.max(-1, Math.min(1, inputData[i]));
+      view.setInt16(i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
     }
 
-    async function captureFrame() {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    socket.emit('audio-chunk', buffer);
+  };
+};
 
-        const dataURL = canvas.toDataURL("image/jpeg");
-
-        fetch("http://10.0.70.50:5000/api/v1/auth/verify-face", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: dataURL }),
-        })
-        .then(res => res.json())
-        .then(data => console.log("Match:", data))
-        .catch(err => console.error(err));
-    }
-
-    document.getElementById("startStopBtn").addEventListener("click", () => {
-        if (isStreaming) {
-            clearInterval(intervalId);
-            video.src = "";
-        } else {
-            startWebcam();
-            intervalId = setInterval(captureFrame, 2000);
-        }
-        isStreaming = !isStreaming;
-    });
+socket.on('translation', ({ transcript, translated }) => {
+  document.getElementById('original').textContent = transcript;
+  document.getElementById('translated').textContent = translated;
+});
 </script>
+
+</html>

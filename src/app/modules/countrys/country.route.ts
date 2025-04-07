@@ -13,7 +13,7 @@ const router  = express.Router();
 
 router.get('/top-world',redisCacheHandler,CountryController.topCountersOfWorld)
 
-router.get('/top-regions/:region', CountryController.topCountersOfRegions)
+router.get('/top-regions/:region',redisCacheHandler, CountryController.topCountersOfRegions)
 
 router.get('/single',CountryController.singleCountriesDetails)
 router.get('/cities/:country',redisCacheHandler, CountryController.citysOFCountries)

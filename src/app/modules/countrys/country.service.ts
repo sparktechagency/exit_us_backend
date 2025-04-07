@@ -9,7 +9,8 @@ import { Move } from "../move/move.model";
 const topCountersOfWorld = async (amount: number = 10) => {
     const response = await fetch("https://restcountries.com/v3.1/all");
     const countries: any[] = await response.json();
-
+   
+    
     // Fetch all existing destination countries in one query & convert to Set
     const existingDestinations = new Set(
         (await Move.find({}, { destinationCountry: 1, _id: 0 })).map(doc => doc.destinationCountry)

@@ -15,21 +15,24 @@ const topCountersOfWorld = catchAsync(
             message: "Top countries retrieved successfully",
             data: countries
         }
-        await redisHelper.set(url,response)
+        await redisHelper.client.set(url,response,{ex:60})
         sendResponse(res,response )
     }
 )
 const topCountersOfRegions = catchAsync(
     async (req:Request, res:Response) => {
+        const url = req.originalUrl
         const query:any = req.query
         const region:string = req.params.region
         const countries = await CountryService.topCountersOfRegions(region, query.amount!)
-        sendResponse(res, {
+        const response = {
             success: true,
             statusCode: 200,
             message: "Top countries retrieved successfully",
             data: countries
-        })
+        }
+        await redisHelper.client.set(url,response,{ex:60})
+        sendResponse(res,response )
     }
 )
 const singleCountriesDetails = catchAsync(

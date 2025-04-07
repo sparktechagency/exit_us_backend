@@ -11,6 +11,7 @@ export const sendVerificationCode = async (phone: string,otp:number) => {
       body:phoneTamplate.sendPhoneValidationMessage(otp),
       from: config.twilio.fromPhone,
       to: phone,
+      
     });
     logger.info('SMS send to phone: ' + message);
 }

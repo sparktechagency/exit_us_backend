@@ -4,7 +4,6 @@ const createTextTranlateZodSchema = z.object({
     body: z.object({
         text: z.string({ required_error: "Text is required" }),
         to: z.string({ required_error: "Target language is required" }),
-        from: z.string({ required_error: "Source language is required" }),
     }),
 })
 
@@ -12,7 +11,6 @@ const createImageTranslateZodSchema = z.object({
     body: z.object({
         image: z.any({ required_error: "Image URL is required" }),
         to: z.string({ required_error: "Target language is required" }),
-        from: z.string({ required_error: "Source language is required" }),
     }),
 })
 

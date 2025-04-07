@@ -31,6 +31,7 @@ app.get('/', (req: Request, res: Response) => {
   );
 });
 
+
 //global error handle
 app.use(globalErrorHandler);
 
