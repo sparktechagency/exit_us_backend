@@ -54,8 +54,22 @@ const voiceTranslateText = catchAsync(
     }
     )
 
+const getLanguages = catchAsync(
+    async (req:Request,res:Response)=>{
+        const data = await TranslatorService.languagesFromGoogle()
+        sendResponse(res, {
+            success: true,
+            statusCode: 200,
+            message: "Languages fetched successfully",
+            data: data
+        })
+    }
+    )
+
+
 export const TranslatorController = {
     trnaslateText,
     translateTextFromImage,
-    voiceTranslateText
+    voiceTranslateText,
+    getLanguages
 }

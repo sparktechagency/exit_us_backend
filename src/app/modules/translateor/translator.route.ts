@@ -12,5 +12,6 @@ router.post("/voice",fileUploadHandler(),validateRequest(TranslatorValidation.cr
 
 router.post("/image",fileUploadHandler(),validateRequest(TranslatorValidation.createImageTranslateZodSchema) ,TranslatorController.translateTextFromImage);
 
+router.get('/languages',TranslatorController.getLanguages)
 export const TranslatorRoutes = router;
 

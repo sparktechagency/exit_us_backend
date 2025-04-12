@@ -3,10 +3,16 @@ import { Translate } from '@google-cloud/translate/build/src/v2';
 import vision from '@google-cloud/vision';
 import { Socket } from 'socket.io';
 import { SpeechClient } from '@google-cloud/speech';
+import { StatusCodes } from 'http-status-codes';
+import ApiError from '../../../errors/ApiError';
 const visionClient = new vision.ImageAnnotatorClient();
 
-const translate = new Translate();
-const speechClient = new SpeechClient();
+const translate = new Translate({
+    keyFilename:"./config/exit_us.json"
+});
+const speechClient = new SpeechClient({
+    keyFilename:"./config/exit_us.json"
+});
 export const translateText = async (text: string, targetLanguage: string) => {
   const [translation] = await translate.translate(text, targetLanguage);
   return translation;
@@ -84,8 +90,17 @@ export const translateImage = async (imagePath: string, targetLang: string) => {
   }
 
 
+const languagesFromGoogle = async ()=>{
+  const languages = await translate.getLanguages()
+  if(!languages.length){
+    throw new ApiError(StatusCodes.NOT_FOUND,'Languages not found')
+  }
+  return languages
+}
+
 export const TranslatorService = {
     translateText,
     translateImage,
-    realTimeVoiceTranslate
+    realTimeVoiceTranslate,
+    languagesFromGoogle
 }
