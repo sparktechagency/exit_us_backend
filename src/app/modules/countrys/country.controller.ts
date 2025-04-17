@@ -62,10 +62,36 @@ const citysOFCountries = catchAsync(
         sendResponse(res,response )
     }
 )
+
+const getCountrys = catchAsync(
+    async (req:Request, res:Response) => {
+        const countries = await CountryService.getCountrysFromApi()
+        sendResponse(res, {
+            success: true,
+            statusCode: 200,
+            message: "Countrys retrieved successfully",
+            data: countries
+        })
+    }
+)
+
+const ethenitys = catchAsync(
+    async (req:Request, res:Response) => {
+        const ethenitys = await CountryService.getEthenity()
+        sendResponse(res, {
+            success: true,
+            statusCode: 200,
+            message: "Ethenitys retrieved successfully",
+            data: ethenitys
+        })
+    }
+)
 export const CountryController={
     topCountersOfWorld,
     topCountersOfRegions,
     singleCountriesDetails,
     citysOFCountries,
+    getCountrys,
+    ethenitys
  
 }

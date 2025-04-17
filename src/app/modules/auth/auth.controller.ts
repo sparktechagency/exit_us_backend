@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import path, { join } from 'path';
 import { KysService } from './kyc.service';
+import { getSingleFilePath } from '../../../shared/getFilePath';
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { ...verifyData } = req.body;
   const result = await AuthService.verifyEmailToDB(verifyData);
@@ -21,13 +22,12 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const {...userData } = req.body;
   const files:any=req.files
-  const fileName=files?.image?.length? files.image[0].filename:""
-  const filePath = `/uploads/image/${fileName}`
+  const filePath = getSingleFilePath(files,"image")
   if(files.image){}
   
   const userDetails = {
     ...userData,
-    image:fileName?filePath:"",
+    image:filePath,
     birth_year:Number(userData.birth_year),
   }
   const result = await UserService.createUserToDB(userDetails);
@@ -144,24 +144,28 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   });
 
   const nidSubmit = catchAsync(async (req: Request, res: Response) => {
-    const files:any=req.files
-    const fileName=files?.image?.length? files.image[0].filename:""
-    const cropImageFrom = await KysService.detectAndLabelFaces(path.join(process.cwd(), 'uploads',"image", fileName));
+    const fileName=getSingleFilePath(req.files,"image")
+    const filePath = path.join(process.cwd(), 'uploads', fileName!);
+
+    
+    const cropImageFrom = await KysService.detectAndLabelFaces(filePath);
 
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
       message: 'Your NID has been submitted successfully.',
+      data: cropImageFrom
     });
   })
 
   const verificationFace = catchAsync(
     async (req: Request, res: Response) => {
     // const {image} = req.body // videos
+    const id = req.params.id
     const files:any=req.files
     const fileName=files?.image?.length? files.image[0].filename:""
     const image = path.join(process.cwd(), 'uploads',"image", fileName);
-    const match = await KysService.verifyFace(image)
+    const match = await KysService.verifyFace(image,id)
       sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,

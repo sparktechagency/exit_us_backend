@@ -2,9 +2,8 @@ import {z} from 'zod'
 
 const createReelZodSchema = z.object({
     body: z.object({
-        title: z.string({required_error: 'Title is required'}),
-        description: z.string({required_error: 'Description is required'}),
-        video: z.string({required_error: 'Video is required'}).optional(),
+        caption: z.string({required_error: 'Title is required'}),
+        chunk: z.string({required_error: 'Video is required'}).optional(),
         fileName:z.string({required_error: 'File Name is required'}).optional(),
         chunkIndex : z.string({required_error: 'Chunk Index is required'}).optional(),
         totalChunks : z.string({required_error: 'Total Chunks is required'}).optional(),
@@ -14,9 +13,8 @@ const createReelZodSchema = z.object({
 
 const updateReelZodSchema = z.object({
     body: z.object({
-        title: z.string().optional(),
-        description: z.string().optional(),
-        video: z.string().optional(),
+        caption: z.string().optional(),
+        chunk: z.string().optional(),
         fileName:z.string().optional(),
         chunkIndex : z.string().optional(),
         totalChunks : z.string().optional(),

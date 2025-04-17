@@ -37,6 +37,7 @@
     "@google-cloud/text-to-speech": "^5.8.1",
     "@google-cloud/translate": "^8.5.1",
     "@google-cloud/vision": "^5.1.0",
+    "@grpc/grpc-js": "^1.13.3",
     "@paypal/paypal-server-sdk": "^1.0.0",
     "@types/fs-extra": "^11.0.4",
     "@types/langdetect": "^0.2.2",

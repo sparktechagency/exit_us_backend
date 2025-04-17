@@ -24,46 +24,48 @@ async function loadModels() {
   }
   loadModels().then(() => console.log('Models loaded')).catch(console.error);
 
-  async function enhancedImage (imagePath: string){
-    const randId =Math.floor(Math.random()*100000)
-    const extname = path.extname(imagePath)
-    const enhancedUrl = join(process.cwd(),"uploads","image",randId.toString()+extname)
-    sharp(imagePath)
-    .sharpen() // Increases image sharpness
-    .modulate({ brightness: 1.2, lightness: 1.3 }) // Increase brightness & contrast
-    .toFile(`uploads/image/${randId}${extname}`)
-    .then(() => console.log("Image enhanced!"))
-    .catch(err => console.error(err));
-    return enhancedUrl.normalize();
-  }
+
   async function detectAndLabelFaces(imagePath:string) {
     try {
-
+;
+      
+        // Ensure the image file exists
+        if (!fs.existsSync(imagePath)) {
+          throw new ApiError(400, 'Image file not found');
+  
+        }
+        
+        console.log(imagePath);
       
         // Load the uploaded image using node-canvas
         const img = (await loadImage(imagePath)) as unknown as HTMLImageElement;
+      
+        
 
         // Detect a single face with landmarks from the image
         const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
         const des = detection?.descriptor
     
-        await Kyc.create({face:des})
+       const data= await Kyc.create({face:des})
         
         if (!detection) {
           throw new ApiError(400, 'No face detected in the image');
         }
         fs.unlinkSync(imagePath)
 
-        return des;
+        return {id:data._id};
   
       } catch (error) {
         console.error('Error processing image:', error);
-        throw new ApiError(500, 'Failed to process image');
       }
   }
 
-  const verifyFace = async (image:string)=>{
+  const verifyFace = async (image:string,id:string)=>{
+    const face = await Kyc.findOne({_id:id}).lean()
+
+    if(!face) throw new ApiError(400, 'Face not found');
   //  const img = await base64ToCanvas(image);// image as base64 it was use for video
+
   const img = (await loadImage(image)) as unknown as HTMLImageElement;
     // Detect a single face with landmarks from the image
     const detection = await faceapi.detectSingleFace(img as any).withFaceLandmarks().withFaceDescriptor();
@@ -71,21 +73,18 @@ async function loadModels() {
     if(!des) throw new ApiError(400, 'No face detected in the image');
   
     
-    const faces = await Kyc.find().lean()
-
+  
+    
     let minDistance = 0.6; // Threshold (adjustable)  
-    const match = faces.some(item=>{
-      const faceArr = converToFload32Array(item.face as any)
+    const faceArr = converToFload32Array(face.face as any)
       
-      const distance = faceapi.euclideanDistance(faceArr, des)
-      if (distance < minDistance) {
-        minDistance = distance;
-        Kyc.findOneAndDelete({_id:item._id}).then()
-        return true;
-      }
-      return false;
-    })
+    const distance = faceapi.euclideanDistance(faceArr, des)
+  
+    const match = distance < minDistance
 
+    if(match){
+      await Kyc.deleteOne({_id:id})
+    }
 
     if(!match) throw new ApiError(401, 'Face verification failed');
     

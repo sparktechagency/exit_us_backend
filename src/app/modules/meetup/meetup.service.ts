@@ -17,7 +17,7 @@ const createMeetUpToDB = async (payload: Partial<IMeetup>) => {
 }
 
 const getAllMeetupsFromDB = async (query:Record<string,any>) => {
-    const result = new QueryBuilder(MeetUp.find(),query).paginate().search(['location', 'title' ]);
+    const result = new QueryBuilder(MeetUp.find(),query).paginate().search(['location', 'title' ]).sort()
     const paginateInfo = await result.getPaginationInfo();
     const meetups = await result.modelQuery.populate(['user'  ],['name','email','image','bio','phone']).exec();
     return { meetups, paginateInfo };

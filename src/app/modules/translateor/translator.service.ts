@@ -5,7 +5,10 @@ import { Socket } from 'socket.io';
 import { SpeechClient } from '@google-cloud/speech';
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../errors/ApiError';
-const visionClient = new vision.ImageAnnotatorClient();
+import { Language } from './language/language.model';
+import Tesseract from 'tesseract.js';
+import unlinkFile from '../../../shared/unlinkFile';
+import { unlinkSync } from 'fs';
 
 const translate = new Translate({
     keyFilename:"./config/exit_us.json"
@@ -18,25 +21,38 @@ export const translateText = async (text: string, targetLanguage: string) => {
   return translation;
 };
 
-export const translateImage = async (imagePath: string, targetLang: string) => {
-    // Step 1: Extract text from image
-    const [result] = await visionClient.textDetection(imagePath);
-    const detections = result.textAnnotations;
+// export const translateImage = async (imagePath: string, targetLang: string) => {
+//     // Step 1: Extract text from image
+//     const [result] = await visionClient.textDetection(imagePath);
+//     const detections = result.textAnnotations;
   
-    if (!detections || detections.length === 0) {
-      throw new Error('No text found in image');
-    }
+//     if (!detections || detections.length === 0) {
+//       throw new Error('No text found in image');
+//     }
   
-    const extractedText = detections[0].description;
+//     const extractedText = detections[0].description;
   
-    // Step 2: Translate extracted text
-    const [translatedText] = await translate.translate(extractedText!, targetLang);
+//     // Step 2: Translate extracted text
+//     const [translatedText] = await translate.translate(extractedText!, targetLang);
   
-    return {
-      extractedText,
-      translatedText,
-    };
+//     return {
+//       extractedText,
+//       translatedText,
+//     };
+//   };
+
+const translateImage = async (imagePath: string, targetLang: string,fromLang:string) => {
+  const language = await Tesseract.recognize(imagePath,fromLang)
+  const extractedText = language.data.text.replace(/\n/g, ' ');
+  const [translatedText] = await translate.translate(extractedText, targetLang);
+
+  unlinkSync(imagePath)
+  return {
+    extractedText,
+    translatedText,
   };
+  
+}
 
   const realTimeVoiceTranslate = (socket:Socket)=>{
     let recognizeStream: any;
@@ -91,7 +107,7 @@ export const translateImage = async (imagePath: string, targetLang: string) => {
 
 
 const languagesFromGoogle = async ()=>{
-  const languages = await translate.getLanguages()
+  const languages = await Language.find({})
   if(!languages.length){
     throw new ApiError(StatusCodes.NOT_FOUND,'Languages not found')
   }

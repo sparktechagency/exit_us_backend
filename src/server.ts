@@ -6,6 +6,7 @@ import config from './config';
 import { seedSuperAdmin } from './DB/seedAdmin';
 import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
+import { seedLanguage } from './DB/seedLanguage';
 
 //uncaught exception
 process.on('uncaughtException', error => {
@@ -21,7 +22,7 @@ async function main() {
 
     //Seed Super Admin after database connection is successful
     await seedSuperAdmin();
-
+    await seedLanguage()
     const port =
       typeof config.port === 'number' ? config.port : Number(config.port);
 

@@ -6,22 +6,36 @@ import sendResponse from "../../../shared/sendResponse";
 import { CommentService } from "../comment/comment.service";
 import { Types } from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
-
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 const postReel = catchAsync(
     async (req:Request,res:Response)=>{
-        const requestBody = req.body;
-        const user:any = req.user;
-        const reelDetails:IReel = {
-            user:user.id,
-            video_url: requestBody?.finalVideoPath?`/uploads/video/${requestBody.finalVideoPath}`:"",
-            caption: requestBody.caption
+        const { chunkIndex, totalChunks, fileName,caption} = req.body;
+
+        const {date,hour,minit}={date:new Date().toDateString(),hour:new Date().getHours(),minit:new Date().getMinutes()}
+        const extName = path.extname(fileName);
+        let filename = `video-${fileName.slice(0,10)}-${date}-${hour}-${minit}-${caption}${extName}`.replace(/\s/g, '-');
+        const isExist = path.join(process.cwd(), "uploads",'video',filename);
+        if (fs.existsSync(isExist)) {
+            filename = `video-${fileName.slice(0,10)}-${date}-${hour}-${minit}-${caption.slice(0,10)}1${extName}`.replace(/\s/g, '-');
         }
-        const newReel = await ReelService.saveReeltoDB(reelDetails);
+      
+        
+
+        await ReelService.stremUploadVideo(chunkIndex, totalChunks, filename, req.file);
+        if(chunkIndex === totalChunks-1){
+            await ReelService.saveReeltoDB({
+                user: req.user.id,
+                video_url: `/uploads/video/${filename}`,   
+                caption,
+            })
+        }
+     
         sendResponse(res, {
             success: true,
             statusCode: 201,
             message: "Reel added successfully",
-            data: newReel
         })
 
     }
@@ -92,6 +106,11 @@ const deleteComment = catchAsync(
         })
     })
 
+const getVideoStrem = catchAsync(
+    async (req:Request, res:Response)=>{
+        const url = req.params.url;
+    await ReelService.sendVideoInStream(req,res,url);
+    })
 
 
 
@@ -102,5 +121,6 @@ export const ReelController = {
     likeReel,
     commentOnReel,
     getAllCommentsToDB,
-    deleteComment
+    deleteComment,
+    getVideoStrem
 }

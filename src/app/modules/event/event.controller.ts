@@ -4,14 +4,17 @@ import { EventService } from "./event.service";
 import sendResponse from "../../../shared/sendResponse";
 import path from 'path'
 import { Types } from "mongoose";
+import { getSingleFilePath } from "../../../shared/getFilePath";
 
 const createEvent = catchAsync(
     async (req:Request, res:Response) => {
         const eventData = req.body;
         const user:any = req.user;
         const files:any=req.files
-        const fileName= files.image[0].filename
-        const filePath = path.join(process.cwd(), 'uploads', fileName)
+        const fileName= getSingleFilePath(files,"image")
+        console.log(fileName);
+        
+        const filePath = path.join(process.cwd(), 'uploads', fileName!)
 
         const result = await EventService.createEventToDB({...eventData, user:user.id,image: filePath});
         sendResponse(res, {

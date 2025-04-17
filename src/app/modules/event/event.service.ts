@@ -5,7 +5,9 @@ import ApiError from "../../../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
 import QueryBuilder from "../../builder/QueryBuilder";
 
-const createEventToDB = async (payload: Partial<IEvent>) => {
+const createEventToDB = async (payload: Partial<IEvent>) => 
+    {
+        
     const createEvent = await Event.create(payload);
     if (!createEvent) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create event');
@@ -42,7 +44,7 @@ const getAllEventToDB = async (query?:Record<string,{
     searchTerm?:string
 
 }>) => {
-    const result= new QueryBuilder(Event.find({}),query!).paginate().search(['title','location'])
+    const result= new QueryBuilder(Event.find({}),query!).paginate().search(['title','location']).sort()
     const events = await result.modelQuery.populate(['user'],['name','email','phone','bio']).lean().exec();
     if (!events) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to get all events');

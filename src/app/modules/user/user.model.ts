@@ -69,6 +69,9 @@ const userSchema = new Schema<IUser, UserModal>(
     },
     expat_status:{
       type:String
+    },
+    ethnicity:{
+      type:String
     }
   },
   { timestamps: true }

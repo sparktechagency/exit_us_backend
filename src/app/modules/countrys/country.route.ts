@@ -20,4 +20,7 @@ router.get('/cities/:country',redisCacheHandler, CountryController.citysOFCountr
 
 router.post("/move",auth(USER_ROLES.USER),validateRequest(MovingValidation.createMovingFromCountryZodSchema),MoveController.moveFromCountry)
 
+router.get("/",CountryController.getCountrys)
+
+router.get('/ethnicities',CountryController.ethenitys)
 export const CountryRoutes = router

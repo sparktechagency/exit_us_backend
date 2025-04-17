@@ -20,10 +20,10 @@ const trnaslateText = catchAsync(
 const translateTextFromImage = catchAsync(
     async (req:Request,res:Response)=>{
         const files:any=req.files
-        const {to} = req.body;
+        const {to,from} = req.body;
         const fileName=files?.image?.length? files?.image[0].filename:""
         const filePath = path.join(process.cwd(), 'uploads',"image", fileName)
-        const data = await TranslatorService.translateImage(filePath,to)
+        const data = await TranslatorService.translateImage(filePath,to,from)
         
      
         sendResponse(res, {
@@ -39,10 +39,10 @@ const translateTextFromImage = catchAsync(
 const voiceTranslateText = catchAsync(
     async (req:Request,res:Response)=>{
         const files:any=req.files
-        const {to } = req.body;
+        const {to,from } = req.body;
         const fileName=files?.media?.length? files.media[0].filename:""
         const filePath = path.join(process.cwd(), 'uploads',"media", fileName)
-        const data = await TranslatorService.translateImage(filePath,to)
+        const data = await TranslatorService.translateImage(filePath,to,from)
         
    
         sendResponse(res, {

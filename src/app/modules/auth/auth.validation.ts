@@ -53,8 +53,9 @@ const createRegisterZodSchema = z.object({
     bio:z.string().optional(),
     expat_status:z.string({ required_error: 'Status is required'}),
     residing_country:z.string({ required_error: 'residing_country is required'}).optional(),
-    ethnicity:z.string({ required_error: 'ethnicity is required'}).optional(),
+    ethnicity:z.string({ required_error: 'ethnicity is required'}),
     birth_year:z.string({ required_error: 'BirthYear is required'}),
+    
   }),
 });
 
