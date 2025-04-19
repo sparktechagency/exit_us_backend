@@ -63,10 +63,11 @@ async function loadModels() {
   const verifyFace = async (image:string,id:string)=>{
     const face = await Kyc.findOne({_id:id}).lean()
 
-    if(!face) throw new ApiError(400, 'Face not found');
-  //  const img = await base64ToCanvas(image);// image as base64 it was use for video
+    if(!face) throw new ApiError(400, 'Face not found')
+      
+   const img = await base64ToCanvas(image);// image as base64 it was use for video
 
-  const img = (await loadImage(image)) as unknown as HTMLImageElement;
+  // const img = (await loadImage(image)) as unknown as HTMLImageElement;
     // Detect a single face with landmarks from the image
     const detection = await faceapi.detectSingleFace(img as any).withFaceLandmarks().withFaceDescriptor();
     const des = detection?.descriptor
@@ -76,7 +77,7 @@ async function loadModels() {
   
     
     let minDistance = 0.6; // Threshold (adjustable)  
-    const faceArr = converToFload32Array(face.face as any)
+    const faceArr = converToFload32Array(face?.face as any)
       
     const distance = faceapi.euclideanDistance(faceArr, des)
   

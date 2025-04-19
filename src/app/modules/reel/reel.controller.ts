@@ -24,10 +24,11 @@ const postReel = catchAsync(
         
 
         await ReelService.stremUploadVideo(chunkIndex, totalChunks, filename, req.file);
-        if(chunkIndex === totalChunks-1){
+        if(chunkIndex == totalChunks-1){
+            
             await ReelService.saveReeltoDB({
                 user: req.user.id,
-                video_url: `/uploads/video/${filename}`,   
+                video_url: `${filename}`,   
                 caption,
             })
         }

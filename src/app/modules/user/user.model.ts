@@ -72,7 +72,7 @@ const userSchema = new Schema<IUser, UserModal>(
     },
     ethnicity:{
       type:String
-    }
+    },
   },
   { timestamps: true }
 );

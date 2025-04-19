@@ -12,6 +12,7 @@ import path from "path";
 import fs from "fs";
 import { Request, Response } from "express";
 import { timeHelper } from "../../../helpers/timeHelper";
+import { Comment } from "../comment/comment.model";
 const saveReeltoDB = async (reel:IReel) => {
     const createReel = await Reel.create({...reel});
     if (!createReel) {
@@ -42,11 +43,12 @@ const deleteReelToDB = async (reelId: Types.ObjectId, user:JwtPayload) => {
 }
 
 const getAllReelsFromDB = async (query:Record<string,any>,user:Types.ObjectId|null=null) => {
-    const result = new QueryBuilder(Reel.find({}), query).paginate().search(['video_url','caption'])
+    const result = new QueryBuilder(Reel.find({}), query).paginate().search(['video_url','caption']).sort();
     const reels = await result.modelQuery.populate(['user'],['image','name','email','phone']).lean().exec();
     const reelsWithLikes = await Promise.all(reels.map(async (reel:any) => {
         reel.likes = await Like.countDocuments({ reel: reel._id }).exec();
         reel.isILike = await Like.countDocuments({user,reel:reel._id})
+        reel.comments = await Comment.countDocuments({ reel: reel._id }).exec();
         return reel;
     }))
     if (!reelsWithLikes) {

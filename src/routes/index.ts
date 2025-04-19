@@ -10,6 +10,7 @@ import { TranslatorRoutes } from '../app/modules/translateor/translator.route';
 import { CountryRoutes } from '../app/modules/countrys/country.route';
 import path from 'path';
 import { NetworkRoutes } from '../app/modules/network/network.route';
+import { AdviceRoutes } from '../app/modules/advice/advice.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -52,6 +53,10 @@ const apiRoutes = [
   {
     path:"/network",
     route: NetworkRoutes
+  },
+  {
+    path:"/advice",
+    route:AdviceRoutes
   }
 ];
 

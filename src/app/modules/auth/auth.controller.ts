@@ -160,11 +160,11 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
   const verificationFace = catchAsync(
     async (req: Request, res: Response) => {
-    // const {image} = req.body // videos
+    const {image} = req.body // videos
     const id = req.params.id
     const files:any=req.files
     const fileName=files?.image?.length? files.image[0].filename:""
-    const image = path.join(process.cwd(), 'uploads',"image", fileName);
+    // const image = path.join(process.cwd(), 'uploads',"image", fileName);
     const match = await KysService.verifyFace(image,id)
       sendResponse(res, {
         success: true,

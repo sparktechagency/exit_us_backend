@@ -9,6 +9,8 @@ import { Language } from './language/language.model';
 import Tesseract from 'tesseract.js';
 import unlinkFile from '../../../shared/unlinkFile';
 import { unlinkSync } from 'fs';
+import { log } from 'console';
+import { logger } from '../../../shared/logger';
 
 const translate = new Translate({
     keyFilename:"./config/exit_us.json"
@@ -58,6 +60,7 @@ const translateImage = async (imagePath: string, targetLang: string,fromLang:str
     let recognizeStream: any;
 
   const startRecognitionStream = () => {
+    logger.info('startRecognitionStream');
     recognizeStream = speechClient
       .streamingRecognize({
         config: {
