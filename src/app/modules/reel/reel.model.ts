@@ -19,6 +19,11 @@ const reelSchema = new Schema<IReel,ReelModel>({
     likes:{
         type:Number,
         default: 0
+    },
+    status: {
+        type: String,
+        enum: ['active', 'delete'],
+        default: 'active'
     }
 },{
     timestamps: true

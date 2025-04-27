@@ -7,12 +7,13 @@ import fileUploadHandler from '../../middlewares/fileUploadHandler';
 import validateRequest from '../../middlewares/validateRequest';
 import { ExperienceValidation } from './experience.validation';
 import { ExperienceController } from './experience.controller';
+import tempAuth from '../../middlewares/tempAuth';
 
 const router = express.Router();
 // experience details should formData
 router.post('/',auth(USER_ROLES.USER),fileUploadHandler(),validateRequest(ExperienceValidation.createExperienceZodSchema),ExperienceController.createExperience)
 
-router.get('/user/:id', ExperienceController.getExperiences)
+router.get('/user/:id',tempAuth(), ExperienceController.getExperiences)
 
 router.get('/:id', ExperienceController.getExperience)
 

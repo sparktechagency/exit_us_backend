@@ -13,6 +13,10 @@ const languageSchema = new Schema<ILanguage,LanguageModel>({
     code3: {
         type: String,
         required: true
+    },
+    locale: {
+        type: String,
+        required: true
     }
 },{
     timestamps: true

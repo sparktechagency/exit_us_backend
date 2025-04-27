@@ -8,6 +8,8 @@ import validateRequest from '../../middlewares/validateRequest';
 import { MovingValidation } from '../move/move.validation';
 import { MoveController } from '../move/move.controller';
 import { redisCacheHandler } from '../../middlewares/redisCacheHendler';
+import { CountryValidation } from './country.validation';
+
 
 const router  = express.Router();
 
@@ -23,4 +25,6 @@ router.post("/move",auth(USER_ROLES.USER),validateRequest(MovingValidation.creat
 router.get("/",CountryController.getCountrys)
 
 router.get('/ethnicities',CountryController.ethenitys)
+router.get('/regions',CountryController.getRegions)
+router.get('/details',redisCacheHandler,validateRequest(CountryValidation.getCountryDetailsZodSchema),CountryController.countryDetails)
 export const CountryRoutes = router

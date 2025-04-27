@@ -5,14 +5,14 @@ import sendResponse from "../../../shared/sendResponse";
 import { Types } from "mongoose";
 import path from 'path'
 import ApiError from "../../../errors/ApiError";
+import { getSingleFilePath } from "../../../shared/getFilePath";
 const createExperience = catchAsync(
     async (req:Request, res:Response) => {
         const experienceData = req.body;
         const user:any = req.user;
         const files:any=req.files;
-        const fileName=files?.image?.length? files.image[0].filename:""
-        const filePath =`/uploads/image/${fileName}`
-        const experience = await ExperienceService.createExperienceToDB({...experienceData, user: user.id,image:fileName?filePath:"" });
+        const fileName=getSingleFilePath(files,"image")
+        const experience = await ExperienceService.createExperienceToDB({...experienceData, user: user.id,image:fileName||"" });
         sendResponse(res, {
             success: true,
             statusCode: 201,
@@ -25,8 +25,10 @@ const createExperience = catchAsync(
 const getExperiences = catchAsync(
     async (req:Request, res:Response) => {
         const id:any = req.params.id;
+        const user:any = req.user;
+        const userId = user.id||id
         const query = req.query;
-        const experiences = await ExperienceService.getAllExperiencesFromDB(id as Types.ObjectId, query);
+        const experiences = await ExperienceService.getAllExperiencesFromDB(userId, query);
         sendResponse(res, {
             success: true,
             statusCode: 200,

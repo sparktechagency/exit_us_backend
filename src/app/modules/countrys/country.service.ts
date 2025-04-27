@@ -6,6 +6,10 @@ import path from "path";
 import catchAsync from "../../../shared/catchAsync";
 import { Move } from "../move/move.model";
 import { ethenityData } from "../../../demo-data/ethenity.data";
+import { CountryDetailsService } from "./country-details-service/country.details.service";
+import ApiError from "../../../errors/ApiError";
+import { StatusCodes } from "http-status-codes";
+import { COUNTRY_DETAILS_TOPIC } from "../../../enums/countryDetailsTopic";
 
 const topCountersOfWorld = async (amount: number = 10) => {
     const [countriesResponse, existingMoves] = await Promise.all([
@@ -137,7 +141,7 @@ const singleCountriesDetails = async (query:any)=>{
         flag: country.flags.png,
         image: images.filter((item:any)=>item!=null),
         details: details.extract,
-        distanceInKm: distance.distance.toFixed(2),
+        distanceInKm: distance.distance.toFixed(2)+'kms',
         flightTime: distance.flightTime,
         capital: country.capital,
         region: country.region,
@@ -193,12 +197,53 @@ const getCountrysFromApi =async ()=>{
 const getEthenity =async ()=>{
   return ethenityData.ethnicities
 }
+
+
+const getRegions =async (query:Record<string,any>)=>{
+  const res = await fetch('https://restcountries.com/v3.1/all?fields=region')
+  const data = await res.json()
+  
+  const regions = new Set([...data.map((d:any)=>d.region)])
+  return [...regions]
+}
+
+const countryDetailsFromApi =async (topic:COUNTRY_DETAILS_TOPIC,country:string)=>{
+
+  switch(topic?.toLowerCase()){
+    case 'church':
+      return await CountryDetailsService.getChurchesFromApi(country)
+    
+    case 'music':
+      return await CountryDetailsService.MusicFromApi(country)
+    case 'culture':
+      return await CountryDetailsService.cultureFromApi(country)
+    case 'jobs':
+      return await CountryDetailsService.jobsFromApi(country)
+    case 'safety':
+      return await CountryDetailsService.adviseFromApi(country)
+    case 'visa':
+      return await CountryDetailsService.visaInfoFromApi(country)
+    case 'dual':
+      return await CountryDetailsService.dualChitezenShipInfoFromApi(country)
+    case 'moving':
+      return await CountryDetailsService.movingTipsFromApi(country)
+    case 'cost':
+      return await CountryDetailsService.livingCostFromApi(country)
+    case 'resources':
+      return await CountryDetailsService.resourceListFromAPi(country)
+    default:
+      throw new ApiError(StatusCodes.BAD_REQUEST,'Invalid topic')
+  }
+  
+}
 export const CountryService={
     topCountersOfWorld,
     topCountersOfRegions,
     singleCountriesDetails,
     getCitysByCountry,
     getCountrysFromApi,
-    getEthenity
+    getEthenity,
+    getRegions,
+    countryDetailsFromApi
  
 }

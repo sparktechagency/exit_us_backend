@@ -73,8 +73,9 @@ const deleteMeetup = catchAsync(
 const getUserMeetups = catchAsync(
     async (req:Request, res:Response) => {
         const user:any = req.user;
+        const id = req.params.id
         const query = req.query;
-        const meetups = await MeetupService.getUserMeetupsFromDB(user.id,query);
+        const meetups = await MeetupService.getUserMeetupsFromDB(user.id || id,query);
         sendResponse(res, {
             success: true,
             statusCode: 200,

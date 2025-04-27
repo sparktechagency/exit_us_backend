@@ -39,5 +39,21 @@ export default {
   paypal:{
     client_id: process.env.PAYPAL_CLIENT_ID,
     client_secret: process.env.PAYPAL_CLIENT_SECRET,
+  },
+  gemeni:{
+    apiKey:process.env.GEMINI_API_KEY
+  },
+  togoAdvisory:{
+    apiKey:process.env.TRAVEL_ADVISORY_KEY
+  },
+  locationAPi:{
+    apiKey:process.env.LOCATION_KEY,
+    geoApiKey:process.env.GEO_KEY
+  },
+  musicApi:{
+    apiKey:process.env.MUSIC_KEY
+  },
+  livingCostApi:{
+    apiKey:process.env.LIVING_COST_KEY
   }
 };

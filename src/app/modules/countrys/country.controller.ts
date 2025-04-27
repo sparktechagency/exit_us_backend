@@ -86,12 +86,42 @@ const ethenitys = catchAsync(
         })
     }
 )
+
+const getRegions = catchAsync(
+    async (req:Request, res:Response) => {
+        const query = req.query
+        const regions = await CountryService.getRegions(query)
+        sendResponse(res, {
+            success: true,
+            statusCode: 200,
+            message: "Regions retrieved successfully",
+            data: regions
+        })
+    }
+)
+
+const countryDetails = catchAsync(
+    async (req:Request, res:Response) => {
+        const query:any = req.query
+        const country = await CountryService.countryDetailsFromApi(query.topic||"",query.country||"")
+        const response = {
+            success: true,
+            statusCode: 200,
+            message: "Country details retrieved successfully",
+            data: country
+        }
+        redisHelper.set(req.originalUrl,response)
+        sendResponse(res,response )
+    }
+)
 export const CountryController={
     topCountersOfWorld,
     topCountersOfRegions,
     singleCountriesDetails,
     citysOFCountries,
     getCountrys,
-    ethenitys
+    ethenitys,
+    getRegions,
+    countryDetails
  
 }

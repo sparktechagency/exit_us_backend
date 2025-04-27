@@ -297,10 +297,14 @@ const resetPasswordByEmailOtpToDB = async (email: string, payload: IAuthResetPas
 // Sending Otp To Phone Number
 const sendOtpToDB = async(phone:string)=>{
   const otp = generateOTP()
-  const isExist = PhoneValidation.isExistPhone(phone);
+  const isExist =await PhoneValidation.isExistPhone(phone);
+  console.log(isExist);
+  
   if(!isExist){
-    await PhoneValidation.create({phone, otp, expireAt: new Date(Date.now() + 3 * 60000)})
     const result = await phoneHelper.sendVerificationCode(phone,otp)
+    
+   const data =  await PhoneValidation.create({phone, otp, expireAt: new Date(Date.now() + 3 * 60000)})
+   console.log(data);
   }else{
     const isExpired = PhoneValidation.isExpiredOtp(phone);
     if(isExpired){
@@ -319,7 +323,9 @@ const matchOtpFromDB = async (phone:string, otp:number)=>{
   if(!isExist){
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Phone number does not exist')
   }
-  const isExpired = PhoneValidation.isExpiredOtp(phone);
+  const isExpired =await PhoneValidation.isExpiredOtp(phone);
+
+  
   if(isExpired){
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Otp expired, please request again')
   }

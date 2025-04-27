@@ -21,6 +21,11 @@ const meetupSchema = new Schema<IMeetup,MeetupModel>({
     user: {
         type: Schema.Types.ObjectId,
         ref: "User"
+    },
+    status: {
+        type: String,
+        enum: ['active', 'delete'],
+        default: 'active'
     }
 },{
     timestamps: true

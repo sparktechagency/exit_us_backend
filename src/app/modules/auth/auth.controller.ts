@@ -23,7 +23,6 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
   const {...userData } = req.body;
   const files:any=req.files
   const filePath = getSingleFilePath(files,"image")
-  if(files.image){}
   
   const userDetails = {
     ...userData,
@@ -70,6 +69,8 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers.authorization;
+  console.log(token);
+  
   const { ...resetData } = req.body;
   const result = await AuthService.resetPasswordToDB(token!, resetData);
 

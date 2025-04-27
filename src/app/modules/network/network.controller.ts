@@ -15,6 +15,19 @@ const topReturnees = catchAsync(
     }
 )
 
+const communitys = catchAsync(
+    async (req:Request,res:Response)=>{
+        const {amount } = req.query;
+        const returnees = await NetworkService.communitys()
+        sendResponse(res, {
+            success: true,
+            statusCode: 200,
+            data: returnees
+        })
+    }
+)
+
 export const NetworkController = {
-    topReturnees
+    topReturnees,
+    communitys
 }

@@ -35,7 +35,7 @@ const deleteReelToDB = async (reelId: Types.ObjectId, user:JwtPayload) => {
         return result;
 
     }
-    const deleteReel = await Reel.findByIdAndDelete({ _id: reelId, user: user.id });
+    const deleteReel = await Reel.findOneAndUpdate({ _id: reelId, user: user.id },{status:'delete'}).exec();
     if (!deleteReel) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Reel not found');
     }

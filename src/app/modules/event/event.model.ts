@@ -26,6 +26,11 @@ const eventSchema = new Schema<IEvent,EventModel>({
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['active', 'delete'],
+        default: 'active'
     }
 },{
     timestamps: true

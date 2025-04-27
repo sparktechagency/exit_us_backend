@@ -9,6 +9,7 @@ export async function redisCacheHandler(req:Request,res:Response,next:NextFuncti
     
     if(isCache){
         const data = await redisHelper.get(url)
+        
         return sendResponse(res,
             data as any
         )

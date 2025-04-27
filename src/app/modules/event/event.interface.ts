@@ -6,7 +6,8 @@ export type IEvent={
     date:String;
     location:string;
     image:string;
-    user:Types.ObjectId
+    user:Types.ObjectId,
+    status?:"active"|"delete"
 }
 
 export type EventModel = Model<IEvent> 

@@ -6,6 +6,7 @@ export type IReel = {
     caption?: string;
     user:Types.ObjectId
     likes?: number;
+    status?: "active" | "delete";
 }
 
 export type ReelModel = {

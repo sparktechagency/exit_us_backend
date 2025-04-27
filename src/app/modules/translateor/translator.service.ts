@@ -11,6 +11,8 @@ import unlinkFile from '../../../shared/unlinkFile';
 import { unlinkSync } from 'fs';
 import { log } from 'console';
 import { logger } from '../../../shared/logger';
+import axios from 'axios';
+import wiki from 'wikipedia';
 
 const translate = new Translate({
     keyFilename:"./config/exit_us.json"

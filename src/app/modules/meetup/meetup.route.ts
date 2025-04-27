@@ -4,6 +4,7 @@ import { MeetupValidation } from './meetup.validation';
 import { MeetupController } from './meetup.controller';
 import auth from '../../middlewares/auth';
 import { USER_ROLES } from '../../../enums/user';
+import tempAuth from '../../middlewares/tempAuth';
 
 const router = express.Router();
 
@@ -17,6 +18,6 @@ router.put('/:id',auth(USER_ROLES.USER),validateRequest(MeetupValidation.updateM
 
 router.delete('/:id',auth(USER_ROLES.USER,USER_ROLES.SUPER_ADMIN), MeetupController.deleteMeetup)
 
-router.get('/user', auth(USER_ROLES.USER),MeetupController.getUserMeetups)
+router.get('/user/:id', tempAuth(),MeetupController.getUserMeetups)
 
 export const MeetupRoutes = router;

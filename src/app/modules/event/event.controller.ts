@@ -12,11 +12,9 @@ const createEvent = catchAsync(
         const user:any = req.user;
         const files:any=req.files
         const fileName= getSingleFilePath(files,"image")
-        console.log(fileName);
-        
-        const filePath = path.join(process.cwd(), 'uploads', fileName!)
+    
 
-        const result = await EventService.createEventToDB({...eventData, user:user.id,image: filePath});
+        const result = await EventService.createEventToDB({...eventData, user:user.id,image: fileName});
         sendResponse(res, {
             success: true,
             statusCode: 201,
@@ -55,8 +53,12 @@ const getAllEvents = catchAsync(
 
 const getUserEvents = catchAsync(
     async (req:Request, res:Response) => {
+        const id:any = req.params.id
         const user:any = req.user
-        const events = await EventService.getUserEventToDB(user.id);
+        const user_id = user?.id||id
+        
+        const query = req.query
+        const events = await EventService.getUserEventToDB(user_id,query as any);
         sendResponse(res, {
             success: true,
             statusCode: 200,

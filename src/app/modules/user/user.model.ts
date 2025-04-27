@@ -73,6 +73,22 @@ const userSchema = new Schema<IUser, UserModal>(
     ethnicity:{
       type:String
     },
+    city:{
+      type:String,
+      required: true,
+    },
+    country:{
+      type:String,
+      required: true,
+    },
+    birth_year:{
+      type:Number,
+      required: true,
+    },
+    residing_country: {
+      type: String,
+    },
+    
   },
   { timestamps: true }
 );

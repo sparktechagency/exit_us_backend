@@ -26,14 +26,6 @@ const tempAuth =
         //set user to header
         req.user = verifyUser;
 
-        //guard user
-        if (roles.length && !roles.includes(verifyUser.role)) {
-          throw new ApiError(
-            StatusCodes.FORBIDDEN,
-            "You don't have permission to access this api"
-          );
-        }
-
         next();
       }
     } catch (error) {

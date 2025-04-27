@@ -35,8 +35,6 @@ async function loadModels() {
   
         }
         
-        console.log(imagePath);
-      
         // Load the uploaded image using node-canvas
         const img = (await loadImage(imagePath)) as unknown as HTMLImageElement;
       

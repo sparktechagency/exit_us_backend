@@ -5,7 +5,8 @@ export type IMeetup = {
     description: string;
     location: string;
     date: string;
-    user:Types.ObjectId
+    user:Types.ObjectId,
+    status?:"active"|"delete"
 }
 
 
