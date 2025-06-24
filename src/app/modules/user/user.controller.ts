@@ -52,4 +52,27 @@ const updateProfile = catchAsync(
   }
 );
 
-export const UserController = { createUser, getUserProfile, updateProfile };
+const getUsers = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const result = await UserService.getAllUsersFromDB(query);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Users retrieved successfully',
+    data: result.users,
+    pagination: result.pagination,
+  });
+})
+
+const chengeStatus = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserService.changeStatusOfUser(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Status changed successfully',
+    data: result,
+  });
+});
+
+export const UserController = { createUser, getUserProfile, updateProfile, getUsers,chengeStatus };

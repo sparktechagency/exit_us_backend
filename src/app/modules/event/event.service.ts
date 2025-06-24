@@ -46,7 +46,7 @@ const getAllEventToDB = async (query?:Record<string,{
 
 }>) => {
     const result= new QueryBuilder(Event.find({status:{$ne:'delete'}}),query!).paginate().search(['title','location']).sort()
-    const events = await result.modelQuery.populate(['user'],['name','email','phone','bio']).lean().exec();
+    const events = await result.modelQuery.populate(['user'],['name','email','phone','bio','image']).lean().exec();
     if (!events) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to get all events');
     }
@@ -62,8 +62,8 @@ const updateEventToDB = async (eventId: Types.ObjectId, payload: Partial<IEvent>
     return updateEvent;
 }
 
-const deleteEventToDB = async (eventId: Types.ObjectId, user: string) => {
-    const deleteEvent = await Event.findOneAndUpdate({ _id: eventId, user },{ status: 'delete' }).exec();
+const deleteEventToDB = async (eventId: Types.ObjectId) => {
+    const deleteEvent = await Event.findOneAndDelete({ _id: eventId},{ status: 'delete' }).exec();
     if (!deleteEvent) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to delete event');
     }

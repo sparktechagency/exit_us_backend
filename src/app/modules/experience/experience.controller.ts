@@ -26,7 +26,7 @@ const getExperiences = catchAsync(
     async (req:Request, res:Response) => {
         const id:any = req.params.id;
         const user:any = req.user;
-        const userId = user.id||id
+        const userId = id =='user' ? user.id : id;
         const query = req.query;
         const experiences = await ExperienceService.getAllExperiencesFromDB(userId, query);
         sendResponse(res, {

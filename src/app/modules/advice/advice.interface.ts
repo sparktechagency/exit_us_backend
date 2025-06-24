@@ -1,9 +1,10 @@
 import { Model, Types } from "mongoose";
 
 export type IAdvice = {
-    title: string;
     description: string;
-    user:Types.ObjectId
+    user:Types.ObjectId,
+    date:string,
+    image:string,
 }
 
 export type AdviceModel = Model<IAdvice>;

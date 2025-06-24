@@ -11,7 +11,7 @@ const eventSchema = new Schema<IEvent,EventModel>({
         required: true
     },
     date: {
-        type: String,
+        type: Date,
         required: true
     },
     location: {

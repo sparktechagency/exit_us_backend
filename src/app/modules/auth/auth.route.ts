@@ -53,7 +53,7 @@ router.post('/send-otp',validateRequest(AuthValidation.sendOtpZodSchema),AuthCon
 router.post('/verify-otp',validateRequest(AuthValidation.matchOtpZodSchema),AuthController.matchOtpFromPhone)
 router.post('/refresh-token',validateRequest(AuthValidation.createRefreshTokenZodSchema), AuthController.refreshToken)
 router.post('/reset-password-otp',validateRequest(AuthValidation.createResetPasswordUsingOtpZodSchema),AuthController.resetPasswordWithOtp)
-router.post('/upload-nid',fileUploadHandler(),AuthController.nidSubmit)
+router.post('/upload-nid',fileUploadHandler(),validateRequest(AuthValidation.createNidUploadZodSchema),AuthController.nidSubmit)
 router.post("/verify-face/:id",fileUploadHandler(),AuthController.verificationFace)
 
 export const AuthRoutes = router;

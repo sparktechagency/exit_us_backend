@@ -2,10 +2,15 @@ import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import { AdviceService } from "./advice.service";
 import sendResponse from "../../../shared/sendResponse";
+import { getSingleFilePath } from "../../../shared/getFilePath";
 
 const createAdvice = catchAsync(
     async (req:Request, res:Response) => {
         const adviceData = req.body;
+        const image = getSingleFilePath(req.files,'image')
+        if(image){
+            adviceData.image = image;
+        }
         const user = req.user;
         const result = await AdviceService.createAdviceToDB(adviceData,user);
         sendResponse(res, {
@@ -21,7 +26,11 @@ const getAdvice = catchAsync(
     async (req:Request, res:Response) => {
         const id = req.params.id;
         const query = req.query
-        const result = await AdviceService.getAdviceByIdFromDB(id,query);
+        const user:any  = req.user;
+
+        const user_id = id=='user'?user.id:id;
+
+        const result = await AdviceService.getAdviceByIdFromDB(user_id,query);
         sendResponse(res, {
             success: true,
             statusCode: 200,

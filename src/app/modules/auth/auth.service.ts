@@ -19,6 +19,7 @@ import { User } from '../user/user.model';
 import { phoneHelper } from '../../../helpers/phoneHelper';
 import { PhoneValidation } from '../phoneValidation/phoneValidation.model';
 import jwt from 'jsonwebtoken';
+import { Kyc } from './kyc/kyc.model';
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
   const { email, password } = payload;
@@ -29,10 +30,14 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
   //check verified and status
   if (!isExistUser.verified) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      'Please verify your account, then try to login again'
-    );
+    const faceData = await Kyc.findOne({email:isExistUser.email,status:'verified'})
+    if(!faceData){
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Please verify your email address!')
+    }
+
+    await User.findOneAndUpdate({ email }, { verified: true });
+    await Kyc.findByIdAndDelete(faceData._id)
+
   }
 
   //check user status
@@ -68,7 +73,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   })
   
 
-  return { createToken,refreshToken };
+  return { accessToken:createToken,refreshToken };
 };
 
 //forget password

@@ -2,10 +2,6 @@ import { model, Schema } from "mongoose";
 import { AdviceModel, IAdvice } from "./advice.interface";
 
 const adviceSchema = new Schema<IAdvice,AdviceModel>({
-    title: {
-        type: String,
-        required: true
-    },
     description: {
         type: String,
         required: true
@@ -14,7 +10,14 @@ const adviceSchema = new Schema<IAdvice,AdviceModel>({
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    date: {
+        type: String,
+    },
+    image: {
+        type: String,
     }
+
 },{
     timestamps: true
 })

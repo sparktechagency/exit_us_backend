@@ -13,9 +13,8 @@ const router = express.Router();
 // experience details should formData
 router.post('/',auth(USER_ROLES.USER),fileUploadHandler(),validateRequest(ExperienceValidation.createExperienceZodSchema),ExperienceController.createExperience)
 
-router.get('/user/:id',tempAuth(), ExperienceController.getExperiences)
+router.get('/:id',tempAuth(), ExperienceController.getExperiences)
 
-router.get('/:id', ExperienceController.getExperience)
 
 router.put('/:id',auth(USER_ROLES.USER),validateRequest(ExperienceValidation.updateExperienceZodSchema), ExperienceController.updatedExperience)
 

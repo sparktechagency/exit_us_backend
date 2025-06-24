@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { USER_ROLES } from '../../../enums/user';
 
 export type IUser = {
@@ -24,6 +24,7 @@ export type IUser = {
   residing_country: string;
   ethnicity: string;
   birth_year: number;
+  subscription ?: Types.ObjectId|null;
   
 };
 

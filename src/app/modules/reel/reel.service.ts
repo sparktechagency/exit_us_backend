@@ -47,7 +47,7 @@ const getAllReelsFromDB = async (query:Record<string,any>,user:Types.ObjectId|nu
     const reels = await result.modelQuery.populate(['user'],['image','name','email','phone']).lean().exec();
     const reelsWithLikes = await Promise.all(reels.map(async (reel:any) => {
         reel.likes = await Like.countDocuments({ reel: reel._id }).exec();
-        reel.isILike = await Like.countDocuments({user,reel:reel._id})
+        reel.isILike = (await Like.countDocuments({user,reel:reel._id}))?true:false;
         reel.comments = await Comment.countDocuments({ reel: reel._id }).exec();
         return reel;
     }))
@@ -58,19 +58,23 @@ const getAllReelsFromDB = async (query:Record<string,any>,user:Types.ObjectId|nu
     return { reelsWithLikes, paginateInfo };
 }
 
-const likeReelToDB = async (reelId: Types.ObjectId, userId: Types.ObjectId) => {
-    //check if user already liked the reel
-    const alreadyLiked = await Like.findOne({ reel: reelId, user: userId }).exec();
-    if (alreadyLiked) {
-        //unlike the reel
-        const deleteReel = await Like.deleteOne({ _id: alreadyLiked._id }).exec();
-        return deleteReel;
+const likeReelToDB = async (reelId: Types.ObjectId,status:boolean, userId: Types.ObjectId) => {
+    if(status==true){
+        const existLike = await Like.findOne({ reel: reelId, user: userId });
+        if (existLike) {
+            return existLike;
+        }
+        const like = await Like.create({ reel: reelId, user: userId });
+        if (!like) {
+            throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to like reel');
+        }
+        return like;
     }
-    const likereel = await Like.create({ reel: reelId, user: userId });;
-    if (!likereel) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to like reel');
+    const unlike = await Like.findOneAndDelete({ reel: reelId, user: userId });
+    if (!unlike) {
+        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to unlike reel');
     }
-    return likereel;
+    return unlike;
 }
 
 const giveCommentToDB = async (reelId: Types.ObjectId, userId: Types.ObjectId, comment: string) => {

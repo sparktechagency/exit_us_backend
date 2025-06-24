@@ -10,8 +10,14 @@ import { CountryDetailsService } from "./country-details-service/country.details
 import ApiError from "../../../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
 import { COUNTRY_DETAILS_TOPIC } from "../../../enums/countryDetailsTopic";
+import { paginationHelper } from "../../../helpers/paginationHelper";
+import { imageHelper } from "../../../helpers/imageHelper";
+import { demoImage } from "./country.contstrant";
+import { searchHelper } from "../../../helpers/wikiSearchHelper";
+const userAgent= "ytyyt";
+const topCountersOfWorld = async (query:Record<string, any>) => {
 
-const topCountersOfWorld = async (amount: number = 10) => {
+  
     const [countriesResponse, existingMoves] = await Promise.all([
       fetch("https://restcountries.com/v3.1/all?fields=name,population,flags"),
       Move.find({}, { destinationCountry: 1, _id: 0 })
@@ -32,96 +38,128 @@ const topCountersOfWorld = async (amount: number = 10) => {
         flag: country.flags?.png || "",
       });
     }
-  
-    const getImage = async (name: string): Promise<string> => {
-      const imgs = await wiki.images(name);
-      
-      return imgs.find((img) => ['.jpg','.png','.gif','.webp'].includes(path.extname(img.url)))?.url || "";
-    };
-  
-    const buildCountryInfo = async (name: string) => {
-      const data = countryMap.get(name);
-      const movingPeople = await Move.countDocuments({ destinationCountry: name });
-      const image = await getImage(name);
-      return {
-        name,
-        flag: data.flag,
-        population: data.population,
-        image,
-        movingPeople,
+
+    try {
+      const getImage = async (name: string): Promise<string> => {
+        const imgs = await wiki.images(name);
+        
+        return imgs.find((img) => ['.jpg','.png','.gif','.webp'].includes(path.extname(img.url)))?.url || "";
       };
-    };
-  
-    // Prioritize existing countries with Move data
-    const existingCountriesList = await Promise.all(
-      [...existingDestinations]
-        .filter(name => countryMap.has(name))
-        .map(buildCountryInfo)
-    );
-  
-    // Sort by most people moving
-    const sortedExisting = existingCountriesList.sort((a, b) => b.movingPeople - a.movingPeople);
-  
-    const result: any[] = [...sortedExisting];
-  
-    // Fill remaining slots with top populated countries (not already included)
-    if (result.length < amount) {
-      const missingCount = amount - result.length;
-  
-      const alreadyIncluded = new Set(result.map(c => c.name));
-  
-      const topPopulated = countries
-        .filter(c => !alreadyIncluded.has(c.name.common))
-        .sort((a, b) => b.population - a.population)
-        .slice(0, missingCount);
-  
-      const populatedData = await Promise.all(
-        topPopulated.map(async c => {
-          const name = c.name.common;
-          const image = await getImage(name);
-          return {
-            name,
-            flag: c.flags?.png || "",
-            population: c.population,
-            image,
-            movingPeople: 0,
-          };
-        })
+    
+    
+      const buildCountryInfo = async (name: string) => {
+        const data = countryMap.get(name);
+        const movingPeople = await Move.countDocuments({ destinationCountry: name });
+        return {
+          name,
+          flag: data.flag,
+          population: data.population,
+          image:"",
+          movingPeople,
+        };
+      };
+    
+      // Prioritize existing countries with Move data
+      const existingCountriesList = await Promise.all(
+        [...existingDestinations]
+          .filter(name => countryMap.has(name))
+          .map(buildCountryInfo)
       );
+    
+      // Sort by most people moving
+      const sortedExisting = existingCountriesList.sort((a, b) => b.movingPeople - a.movingPeople);
+    
+      const result: any[] = [...sortedExisting];
+    
+      // Fill remaining slots with top populated countries (not already included)
+      const amount = query.limit || 10;
   
-      result.push(...populatedData);
-    }
+      if (result.length < amount) {
   
-    return result.slice(0, amount);
+    
+        const alreadyIncluded = new Set(result.map(c => c.name));
+    
+        const topPopulated = countries
+          .filter(c => !alreadyIncluded.has(c.name.common))
+          .sort((a, b) => b.population - a.population)
+    
+        const populatedData = await Promise.all(
+          topPopulated.map(async c => {
+            const name = c.name.common;
+            const image = await getImage(name)||demoImage;
+            return {
+              name,
+              flag: c.flags?.png || "",
+              population: c.population,
+              image,
+              movingPeople: 0,
+            };
+          })
+        );
+    
+        result.push(...populatedData);
+      }
+    
+      const paginateArray = paginationHelper.paginateArray(result, query);
+      return {
+        data:await Promise.all(paginateArray.data.map(async (c: any) => {
+          const image = await getImage(c.name)||demoImage;
+          return {
+            ...c,
+            image: image
+          };
+        })),
+        pagination: paginateArray.pagination,
+      }
+    } catch (error) {
+      console.log(error);
+      
+      const customaizeCituys = countries.map((c)=>{
+          return {
+            name: c.name.common,
+            population: c.population,
+            flag: c.flags.png, // Flag image
+          };
+        });
+
+        const paginateArray = paginationHelper.paginateArray(customaizeCituys, query);
+        return {
+          data:paginateArray.data,
+          pagination: paginateArray.pagination,
+        }
+      }
+    
   };
   
 
 
-const topCountersOfRegions = async (region:string,amount:number=10) => {
+const topCountersOfRegions = async (region:string,query:Record<string, any>) => {
     const response = await fetch(`https://restcountries.com/v3.1/region/${region}`);
     const countries = await response.json();
 
-    const sortedCountries =Promise.all(
+    const sortedCountries =await Promise.all(
      countries
       .map( async (c: any) => ({
         name: c.name.common,
         population: c.population,
-        image: (await wiki.images(c.name.common)).filter((item:any)=>{
-            if(!item.url.endsWith(".svg")){
-                return item.url
-            }
-        })[0].url,
         flag: c.flags.png, // Flag image
       }))
     
       .sort((a:any, b:any) => b.population - a.population) // Sort by highest population
-      .slice(0, amount)
-     ) // Get top 10
-      return sortedCountries;
+      
+     )
+
+     const paginateArray = paginationHelper.paginateArray(sortedCountries, query);
+     return {
+        data:paginateArray.data,
+        pagination: paginateArray.pagination,
+      }
+      
     
 }
 
 const singleCountriesDetails = async (query:any)=>{
+
     const lat = query?.latitude
     const long = query?.longitude
     const response = await wiki.page(query.country)
@@ -141,8 +179,8 @@ const singleCountriesDetails = async (query:any)=>{
         flag: country.flags.png,
         image: images.filter((item:any)=>item!=null),
         details: details.extract,
-        distanceInKm: distance.distance.toFixed(2)+'kms',
-        flightTime: distance.flightTime,
+        distanceInKm: (distance.distance.toFixed(2)!="NaN")?distance.distance.toFixed(2)+'kms':"...",
+        flightTime: !distance.flightTime.includes("NaN")?distance.flightTime:"...",
         capital: country.capital,
         region: country.region,
         latitude: latlang[0],
@@ -155,37 +193,74 @@ const singleCountriesDetails = async (query:any)=>{
 const getCitysByCountry = async (countryName: string, query: any) => {
 
     
-    const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/countries/${countryName.toUpperCase()}/regions`
+    const url = `https://countriesnow.space/api/v0.1/countries/cities`
 
     const response = await fetch(url, {
+      method: 'POST',
         headers: {
-            'x-rapidapi-host': config.geo.host!,
-            'X-RapidAPI-Key': config.geo.apiKey!,
+            'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+            country: countryName.toLowerCase(),
+            limit:10
+        }),
     });
-
-    const res: any = await response.json();
     
 
-    const cities: any[] = res.data;
+    const res: any = await response.json()
+    
 
-    // Slice the cities array before starting the async operation
-    const limitedCities = cities.slice(0, query.amount || 10);
 
+    const cities: any[] = res.data?.slice(0, 20);
+    console.log(cities);
+    
+
+try {
+  const data = await Promise.all(
+    cities.map(async (c) => {
+     
+        return {
+            name: c,
+            images:(await imageHelper.getImage(c))[0]||demoImage,
+        };
+      
+    })
+);
+const paginateArray = paginationHelper.paginateArray(data.filter(item=>Boolean(item)), query);
+return {
+    data: paginateArray.data,
+    pagination: paginateArray.pagination,
+};
+} catch (error) {
+  
+
+  
+  const customaizeCituys =await Promise.all(cities.map(async (c)=>{
+
+    const getImage = async (name: string): Promise<string> => {
+      const search = await wiki.search(name);
+      const page = await wiki.page(search.results[0].title);
+      const imgs = await page.images();
+      
+      return imgs.find((img) => ['.jpg','.png','.gif','.webp'].includes(path.extname(img.url)))?.url || "";
+    };
+    
+    return {
+      name: c,
+      images: await getImage(c) || demoImage,
+      details: null,
+    };
+  }))
+  
+  const paginateArray = paginationHelper.paginateArray(customaizeCituys, query);
+  return {
+      data: paginateArray.data,
+      pagination: paginateArray.pagination,
+  };
+}
     // Wait for all city details
-    const data = await Promise.all(
-        limitedCities.map(async (c) => {
-            const details = await wiki.page(c.name);
-            const images = (await details.images()).filter((item: any) => ['.jpg', '.png', '.gif', '.webp'].includes(path.extname(item.url)))[1];
-            return {
-                name: c.name,
-                images: images.url,
-                details: (await details.summary()).extract,
-            };
-        })
-    );
 
-    return data;
+
 };
 
 const getCountrysFromApi =async ()=>{
@@ -236,6 +311,12 @@ const countryDetailsFromApi =async (topic:COUNTRY_DETAILS_TOPIC,country:string)=
   }
   
 }
+
+const getSingleCiyDetails =async (city:string)=>{
+  const response = await searchHelper.wikiSearchService(city)
+  
+  return response
+}
 export const CountryService={
     topCountersOfWorld,
     topCountersOfRegions,
@@ -244,6 +325,7 @@ export const CountryService={
     getCountrysFromApi,
     getEthenity,
     getRegions,
-    countryDetailsFromApi
+    countryDetailsFromApi,
+    getSingleCiyDetails
  
 }

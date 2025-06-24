@@ -27,4 +27,5 @@ router.get("/",CountryController.getCountrys)
 router.get('/ethnicities',CountryController.ethenitys)
 router.get('/regions',CountryController.getRegions)
 router.get('/details',redisCacheHandler,validateRequest(CountryValidation.getCountryDetailsZodSchema),CountryController.countryDetails)
+router.get('/city',CountryController.getCityDetails)
 export const CountryRoutes = router

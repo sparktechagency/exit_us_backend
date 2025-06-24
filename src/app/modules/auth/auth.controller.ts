@@ -47,7 +47,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     statusCode: StatusCodes.OK,
     message: 'User logged in successfully.',
     data: {
-      accessToken: result.createToken,
+      accessToken: result.accessToken,
       refreshToken: result.refreshToken,
 
     },
@@ -68,8 +68,8 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization;
-  console.log(token);
+  const token = req.headers.authorization
+ 
   
   const { ...resetData } = req.body;
   const result = await AuthService.resetPasswordToDB(token!, resetData);
@@ -147,9 +147,10 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const nidSubmit = catchAsync(async (req: Request, res: Response) => {
     const fileName=getSingleFilePath(req.files,"image")
     const filePath = path.join(process.cwd(), 'uploads', fileName!);
+    const email = req.body.email;
 
     
-    const cropImageFrom = await KysService.detectAndLabelFaces(filePath);
+    const cropImageFrom = await KysService.detectAndLabelFaces(filePath, email);
 
     sendResponse(res, {
       success: true,
@@ -161,11 +162,15 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
   const verificationFace = catchAsync(
     async (req: Request, res: Response) => {
-    const {image} = req.body // videos
+    // const {image} = req.body // videos
     const id = req.params.id
+    console.log(id);
+    
     const files:any=req.files
     const fileName=files?.image?.length? files.image[0].filename:""
-    // const image = path.join(process.cwd(), 'uploads',"image", fileName);
+    const image = path.join(process.cwd(), 'uploads',"image", fileName);
+    console.log(image);
+    
     const match = await KysService.verifyFace(image,id)
       sendResponse(res, {
         success: true,

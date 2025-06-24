@@ -75,11 +75,11 @@ const userSchema = new Schema<IUser, UserModal>(
     },
     city:{
       type:String,
-      required: true,
+      // required: true,
     },
     country:{
       type:String,
-      required: true,
+      // required: true,
     },
     birth_year:{
       type:Number,
@@ -88,6 +88,16 @@ const userSchema = new Schema<IUser, UserModal>(
     residing_country: {
       type: String,
     },
+    contact: {
+      type: String,
+    },
+    location: {
+      type: String,
+    },
+    subscription: {
+      type: Schema.Types.ObjectId,
+      ref: 'Subscription',
+    }
     
   },
   { timestamps: true }

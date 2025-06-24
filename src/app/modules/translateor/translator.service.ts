@@ -46,7 +46,8 @@ export const translateText = async (text: string, targetLanguage: string) => {
 //   };
 
 const translateImage = async (imagePath: string, targetLang: string,fromLang:string) => {
-  const language = await Tesseract.recognize(imagePath,fromLang)
+  try {
+      const language = await Tesseract.recognize(imagePath,fromLang)
   const extractedText = language.data.text.replace(/\n/g, ' ');
   const [translatedText] = await translate.translate(extractedText, targetLang);
 
@@ -55,6 +56,13 @@ const translateImage = async (imagePath: string, targetLang: string,fromLang:str
     extractedText,
     translatedText,
   };
+  } catch (error) {
+    return {
+      extractedText: '',
+      translatedText: '',
+    };
+  }
+
   
 }
 

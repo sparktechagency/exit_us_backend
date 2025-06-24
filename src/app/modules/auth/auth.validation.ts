@@ -87,6 +87,13 @@ const createResetPasswordUsingOtpZodSchema = z.object({
   }),
 })
 
+const createNidUploadZodSchema = z.object({
+  body: z.object({
+    image: z.any({ required_error: 'NID is required' }),
+    email: z.string({ required_error: 'Email is required' }),
+  }),
+})
+
 export const AuthValidation = {
   createVerifyEmailZodSchema,
   createForgetPasswordZodSchema,
@@ -98,4 +105,5 @@ export const AuthValidation = {
   matchOtpZodSchema,
   createRefreshTokenZodSchema,
   createResetPasswordUsingOtpZodSchema,
+  createNidUploadZodSchema,
 };

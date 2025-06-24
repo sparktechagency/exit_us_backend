@@ -55,5 +55,14 @@ export default {
   },
   livingCostApi:{
     apiKey:process.env.LIVING_COST_KEY
+  },
+  photosApi:{
+    apiKey:process.env.PHOTOS_API_KEY
+  },
+  baseUrl:{
+    baseUrl:process.env.BASE_URL
+  },
+  apple:{
+    password:process.env.APPLE_SHARED_SECRET,
   }
 };

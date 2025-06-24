@@ -11,6 +11,9 @@ import { CountryRoutes } from '../app/modules/countrys/country.route';
 import path from 'path';
 import { NetworkRoutes } from '../app/modules/network/network.route';
 import { AdviceRoutes } from '../app/modules/advice/advice.route';
+import { DisclaimerRoutes } from '../app/modules/disclaimer/disclaimer.route';
+import { DashboardRoutes } from '../app/modules/dashboard/dashboard.route';
+import { SubscriptionRoutes } from '../app/modules/subscription/subscription.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -57,6 +60,18 @@ const apiRoutes = [
   {
     path:"/advice",
     route:AdviceRoutes
+  },
+  {
+    path:"/disclaimer",
+    route:DisclaimerRoutes
+  },
+  {
+    path:"/dashboard",
+    route:DashboardRoutes
+  },
+  {
+    path:"/subscription",
+    route: SubscriptionRoutes
   }
 ];
 

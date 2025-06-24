@@ -12,15 +12,16 @@ app.use(Morgan.errorHandler);
 
 //body parser
 app.use(cors({
-  origin:"*",
+  origin:['http://10.0.70.44:5173'],
   credentials:true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //file retrieve
-app.use('/api/v1/uploads',express.static('uploads'));
-app.use(express.static('public'));
+app.use(express.static('uploads'));
+app.use('/api/v1',express.static('uploads'));
+
 //router
 app.use('/api/v1', router);
 

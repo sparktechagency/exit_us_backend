@@ -5,19 +5,19 @@ import sendResponse from "../../../shared/sendResponse";
 
 const topReturnees = catchAsync(
     async (req:Request,res:Response)=>{
-        const {amount } = req.query;
-        const returnees = await NetworkService.topReturnees(Number(amount))
+        const query= req.query;
+        const returnees = await NetworkService.topReturnees(query)
         sendResponse(res, {
             success: true,
             statusCode: 200,
-            data: returnees
+            data: returnees.data,
+            pagination:returnees.pagination
         })
     }
 )
 
 const communitys = catchAsync(
     async (req:Request,res:Response)=>{
-        const {amount } = req.query;
         const returnees = await NetworkService.communitys()
         sendResponse(res, {
             success: true,

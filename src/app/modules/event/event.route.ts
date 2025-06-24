@@ -18,7 +18,7 @@ router.get('/get/:id', EventController.getEvent)
 // events details should formData
 router.put('/:id', auth(USER_ROLES.ADMIN, USER_ROLES.USER), fileUploadHandler(), validateRequest(EventValidation.updateEventZodSchema), EventController.updateEvent)
 
-router.delete('/:id', auth(USER_ROLES.ADMIN, USER_ROLES.USER), EventController.deleteEvent)
+router.delete('/:id', auth(USER_ROLES.ADMIN, USER_ROLES.USER,USER_ROLES.SUPER_ADMIN), EventController.deleteEvent)
 
 router.get('/', EventController.getAllEvents)
 

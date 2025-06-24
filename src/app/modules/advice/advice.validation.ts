@@ -1,9 +1,9 @@
-import { z } from "zod";
+import { date, z } from "zod";
 
 const createAdviceValidationZodSchema = z.object({
     body: z.object({
-        title: z.string({required_error: 'Title is required'}),
         description: z.string({required_error: 'Description is required'}),
+        date: z.string().optional(),
     }),
 })
 

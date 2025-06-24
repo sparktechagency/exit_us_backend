@@ -6,7 +6,10 @@ import sendResponse from "../../../shared/sendResponse";
 const createMeetup = catchAsync(
     async (req:Request, res:Response) => {
         const meetupData = req.body;
+        console.log(meetupData);
+        
         const user:any = req.user;
+        meetupData.date = new Date(meetupData.date);
         const meetup = await MeetupService.createMeetUpToDB({...meetupData, user: user.id });
         sendResponse(res, {
             success: true,

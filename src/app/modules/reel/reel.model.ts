@@ -7,10 +7,6 @@ const reelSchema = new Schema<IReel,ReelModel>({
         required: false,
         default: '' // temprorary optional field
     },
-    caption: {
-        type: String,
-        default: ''
-    },
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',

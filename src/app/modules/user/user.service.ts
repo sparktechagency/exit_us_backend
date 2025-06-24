@@ -8,6 +8,7 @@ import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
 
@@ -23,26 +24,7 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
   }
 
-  //send email
-  const otp = generateOTP();
-  const values = {
-    name: createUser.name,
-    otp: otp,
-    email: createUser.email!,
-  };
-  const createAccountTemplate = emailTemplate.createAccount(values);
-  emailHelper.sendEmail(createAccountTemplate);
-
-  //save to DB
-  const authentication = {
-    oneTimeCode: otp,
-    expireAt: new Date(Date.now() + 3 * 60000),
-  };
-  await User.findOneAndUpdate(
-    { _id: createUser._id },
-    { $set: { authentication } }
-  );
-
+  
   return createUser;
 };
 
@@ -80,8 +62,24 @@ const updateProfileToDB = async (
   return updateDoc;
 };
 
+const getAllUsersFromDB = async (query: any) => {
+  const result = new QueryBuilder(User.find({role:USER_ROLES.USER,verified:true}), query).paginate().sort()
+  const users = await result.modelQuery.lean()
+  const pagination = await result.getPaginationInfo()
+  return { users, pagination }
+}
+
+const changeStatusOfUser = async (id:string)=>{
+  const user = await User.findById(id)
+  if(!user) throw new ApiError(StatusCodes.NOT_FOUND, "User not found")
+  await User.findByIdAndUpdate(id,{status:user.status=="delete"?"active":"delete"},{new:true})
+  return user
+}
+
 export const UserService = {
   createUserToDB,
   getUserProfileFromDB,
   updateProfileToDB,
+  getAllUsersFromDB,
+  changeStatusOfUser
 };

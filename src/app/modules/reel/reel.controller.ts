@@ -20,16 +20,17 @@ const postReel = catchAsync(
         if (fs.existsSync(isExist)) {
             filename = `video-${fileName.slice(0,10)}-${date}-${hour}-${minit}-${caption.slice(0,10)}1${extName}`.replace(/\s/g, '-');
         }
-      
+      console.log(chunkIndex, totalChunks)
         
 
         await ReelService.stremUploadVideo(chunkIndex, totalChunks, filename, req.file);
         if(chunkIndex == totalChunks-1){
             
+            
+            
             await ReelService.saveReeltoDB({
                 user: req.user.id,
                 video_url: `${filename}`,   
-                caption,
             })
         }
      
@@ -58,9 +59,9 @@ const getReels = catchAsync(
 
 const likeReel = catchAsync(
     async (req:Request, res:Response)=>{
-        const {reelId} = req.body;
+        const {reelId,status} = req.body;
         const userId = req.user.id;
-        const updatedReel = await ReelService.likeReelToDB(reelId, userId);
+        const updatedReel = await ReelService.likeReelToDB(reelId, status,userId);
         sendResponse(res, {
             success: true,
             statusCode: 200,
@@ -85,12 +86,14 @@ const commentOnReel = catchAsync(
 const getAllCommentsToDB = catchAsync(
     async (req:Request, res:Response)=>{
         const reelId:any = req.params.reelId;
-        const comments = await CommentService.getAllCommentsToDB(reelId as Types.ObjectId);
+        const query = req.query;
+        const comments = await CommentService.getAllCommentsToDB(reelId as Types.ObjectId,query);
         sendResponse(res, {
             success: true,
             statusCode: 200,
             message: "Comments retrieved successfully",
-            data: comments
+            data: comments.result,
+            pagination: comments.pagination
         })
     })
 

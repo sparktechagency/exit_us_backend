@@ -3,6 +3,7 @@ import { IComment } from "./comment.interface";
 import { Comment } from "./comment.model";
 import { JwtPayload } from "jsonwebtoken";
 import { USER_ROLES } from "../../../enums/user";
+import QueryBuilder from "../../builder/QueryBuilder";
 
 const giveCommentToDB = async (comment:Partial<IComment>) => {
     const createComment = await Comment.create({...comment });
@@ -20,12 +21,17 @@ const deleteCommentToDB = async (commentId: Types.ObjectId, userId: Types.Object
     return deleteComment;
 }
 
-const getAllCommentsToDB = async (reelId: Types.ObjectId) => {
-    const comments = await Comment.find({ reel: reelId }).populate('user', ['name', 'email', 'phone', 'bio']).exec();
-    if (!comments) {
-        throw new Error('Failed to get comments');
+const getAllCommentsToDB = async (reelId: Types.ObjectId,query: Record<string, any>) => {
+    const comments = new QueryBuilder(Comment.find({ reel: reelId }), query).sort().paginate()
+
+    const pagination = await comments.getPaginationInfo()
+
+    const result = await comments.modelQuery.populate('user', ['name', 'email', 'phone', 'bio','image']).lean()
+    return {
+        pagination,
+        result
     }
-    return comments;
+
 }
 const deleteCommentFromDB = async (commentId: Types.ObjectId, user:JwtPayload) => {
     if(user.role === USER_ROLES.SUPER_ADMIN){

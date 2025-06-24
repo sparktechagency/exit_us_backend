@@ -25,6 +25,7 @@ const updateReelZodSchema = z.object({
 const likeReelZodSchema = z.object({
     body: z.object({
         reelId: z.string({required_error: 'Reel ID is required'}),
+        status:z.boolean({required_error:"status is required"})
     }),
 })
 

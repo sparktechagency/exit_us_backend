@@ -88,13 +88,14 @@ const deleteEvent = catchAsync(
     async (req:Request, res:Response) => {
         const id:any = req.params.id
         const user:any = req.user
-        const events = await EventService.deleteEventToDB(id as Types.ObjectId, user.id);
+        const events = await EventService.deleteEventToDB(id as Types.ObjectId);
         if(!events) return sendResponse(res, {success: false, statusCode: 404, message: 'Event not found'})
         
         sendResponse(res, {
             success: true,
             statusCode: 200,
             message: 'Event deleted successfully',
+            data: events
         })
     })
 
