@@ -212,7 +212,7 @@ const getCitysByCountry = async (countryName: string, query: any) => {
 
 
     const cities: any[] = res.data?.slice(0, 20);
-    console.log(cities);
+
     
 
 try {

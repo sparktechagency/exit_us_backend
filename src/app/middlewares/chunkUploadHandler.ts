@@ -33,8 +33,7 @@ export const uploadChunkMiddleware = (req: Request, res: Response, next: NextFun
 
     const { fileName, totalChunks, chunkIndex, title, description } = req.body;
 
-    console.log(`✅ Received chunk ${chunkIndex}/${totalChunks} for ${fileName}`);
-
+   
     // Save metadata when first chunk is uploaded
     if (chunkIndex === 0) {
       try {
@@ -47,15 +46,14 @@ export const uploadChunkMiddleware = (req: Request, res: Response, next: NextFun
 
     // Count the uploaded chunks
     const uploadedChunks = fs.readdirSync(UPLOAD_DIR).filter((file) => file.startsWith(fileName));
-    console.log(`📂 Current chunks: ${uploadedChunks.length}/${totalChunks}`);
 
     // If all chunks are uploaded, merge them
     if (uploadedChunks.length === parseInt(totalChunks)) {
-      console.log(`🔄 Merging ${totalChunks} chunks...`);
+
       const finalVideoPath = await mergeChunks(fileName, parseInt(totalChunks), res);
 
       if (finalVideoPath) {
-        console.log(`🎬 Final video saved: ${finalVideoPath}`);
+
         try {
           // Update metadata with final video path (pseudocode, adjust to your DB)
           req.body.finalVideoPath = finalVideoPath; // Attach final path
@@ -99,7 +97,6 @@ const mergeChunks = async (fileName: string, totalChunks: number, res: Response)
   try {
     await Promise.all(chunkPromises);
     writeStream.end();
-    console.log(`🎬 Merged file saved: ${finalFilePath}`);
     return finalFilePath;
   } catch (error) {
     console.error(error);

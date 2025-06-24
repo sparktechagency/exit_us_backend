@@ -30,7 +30,7 @@ async function detectAndLabelFaces(imagePath: string, email: string) {
     // extract text from image
     const result = await Tesseract.recognize(imagePath, 'eng+ben');
     const text = result.data.text;
-    console.log(text.toLowerCase().includes('national'));
+
 
 
     

@@ -303,13 +303,11 @@ const resetPasswordByEmailOtpToDB = async (email: string, payload: IAuthResetPas
 const sendOtpToDB = async(phone:string)=>{
   const otp = generateOTP()
   const isExist =await PhoneValidation.isExistPhone(phone);
-  console.log(isExist);
   
   if(!isExist){
     const result = await phoneHelper.sendVerificationCode(phone,otp)
     
    const data =  await PhoneValidation.create({phone, otp, expireAt: new Date(Date.now() + 3 * 60000)})
-   console.log(data);
   }else{
     const isExpired = PhoneValidation.isExpiredOtp(phone);
     if(isExpired){
@@ -355,7 +353,6 @@ const matchOtpFromDB = async (phone:string, otp:number)=>{
     }
     const leanUser = await ResetToken.findOne({token}).populate(["user"],['_id','email','role']).select('user')
     const user:any = leanUser?.user;
-    console.log(user);
     
     if (!user) {
       throw new ApiError(StatusCodes.UNAUTHORIZED, 'User not found');

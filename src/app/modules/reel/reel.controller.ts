@@ -20,7 +20,7 @@ const postReel = catchAsync(
         if (fs.existsSync(isExist)) {
             filename = `video-${fileName.slice(0,10)}-${date}-${hour}-${minit}-${caption.slice(0,10)}1${extName}`.replace(/\s/g, '-');
         }
-      console.log(chunkIndex, totalChunks)
+
         
 
         await ReelService.stremUploadVideo(chunkIndex, totalChunks, filename, req.file);
