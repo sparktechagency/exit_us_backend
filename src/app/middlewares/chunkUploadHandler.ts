@@ -104,5 +104,4 @@ const mergeChunks = async (fileName: string, totalChunks: number, res: Response)
   }
 };
 
-// Function to save video metadata to the database (pseudocode)
 
