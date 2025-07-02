@@ -1,24 +1,22 @@
+import { USER_ROLES } from "../../../enums/user"
 import { countriesHelper } from "../../../helpers/countrysHelper"
 import { paginationHelper } from "../../../helpers/paginationHelper"
+import QueryBuilder from "../../builder/QueryBuilder"
 import { CountryService } from "../countrys/country.service"
 import { Move } from "../move/move.model"
 import { User } from "../user/user.model"
 
 const topReturnees = async (query:Record<string, any>) => {
 
-    const users = await Move.aggregate([
-        { $group: { _id: "$user", totalMoves: { $sum: 1 } } },
-        { $lookup: { from: "users", localField: "_id", foreignField: "_id", as: "user" } },
-        { $unwind: "$user" },
-        { $sort: { totalMoves: -1 } },
-        { $project: { _id: "$user._id", name: "$user.name", image: "$user.image", totalMoves: 1, email: "$user.email", phone: "$user.phone", country: "$user.country"} },
+    const UserQuery = new QueryBuilder(User.find({verified:true,role:USER_ROLES.USER}),query).paginate()
+    const [users,pagination] = await Promise.all([
+        UserQuery.modelQuery.lean(),
+        UserQuery.getPaginationInfo()
     ])
 
-
-    const paginateArray = paginationHelper.paginateArray(users, query)
     return {
-        data: paginateArray.data,
-        pagination: paginateArray.pagination
+        data: users,
+        pagination
     }
     
 
