@@ -47,7 +47,6 @@ async function main() {
   } catch (error) {
    console.log(error);
    
-   
     errorLogger.error(colors.red('🤢 Failed to connect Database'));
   }
 

@@ -12,7 +12,7 @@ app.use(Morgan.errorHandler);
 
 //body parser
 app.use(cors({
-  origin:['http://10.0.70.44:5173'],
+  origin:['http://10.0.70.44:5173','http://10.0.70.44:5175'],
   credentials:true
 }));
 app.use(express.json());

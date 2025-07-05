@@ -18,9 +18,6 @@ const topReturnees = async (query:Record<string, any>) => {
         data: users,
         pagination
     }
-    
-
-
 }
 
 const communitys = async ()=>{
