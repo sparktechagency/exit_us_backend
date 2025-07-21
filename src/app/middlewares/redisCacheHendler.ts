@@ -6,6 +6,7 @@ import catchAsync from "../../shared/catchAsync";
 export async function redisCacheHandler(req:Request,res:Response,next:NextFunction){
     const url = req.originalUrl
     const isCache =await redisHelper.client.exists(url)
+    console.log(isCache);
     
     if(isCache){
         const data = await redisHelper.get(url)
