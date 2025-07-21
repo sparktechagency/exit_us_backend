@@ -17,7 +17,7 @@ router.get('/top-world',redisCacheHandler,CountryController.topCountersOfWorld)
 
 router.get('/top-regions/:region',redisCacheHandler, CountryController.topCountersOfRegions)
 
-router.get('/single',CountryController.singleCountriesDetails)
+router.get('/single',redisCacheHandler,CountryController.singleCountriesDetails)
 router.get('/cities/:country',redisCacheHandler, CountryController.citysOFCountries)
 
 router.post("/move",auth(USER_ROLES.USER),validateRequest(MovingValidation.createMovingFromCountryZodSchema),MoveController.moveFromCountry)

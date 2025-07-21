@@ -41,12 +41,14 @@ const singleCountriesDetails = catchAsync(
     async (req:Request, res:Response) => {
         const query = req.query
         const country = await CountryService.singleCountriesDetails(query)
-        sendResponse(res, {
+        const response = {
             success: true,
             statusCode: 200,
-            message: "Country retrieved successfully",
+            message: "Country details retrieved successfully",
             data: country
-        })
+        }
+        await redisHelper.set(req.originalUrl,response)
+        sendResponse(res,response)
     }
 )
 const citysOFCountries = catchAsync(
