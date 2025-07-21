@@ -11,13 +11,13 @@ import tempAuth from '../../middlewares/tempAuth';
 
 const router = express.Router();
 // experience details should formData
-router.post('/',auth(USER_ROLES.USER),fileUploadHandler(),validateRequest(ExperienceValidation.createExperienceZodSchema),ExperienceController.createExperience)
+router.post('/',auth(),fileUploadHandler(),validateRequest(ExperienceValidation.createExperienceZodSchema),ExperienceController.createExperience)
 
 router.get('/:id',tempAuth(), ExperienceController.getExperiences)
 
 
-router.put('/:id',auth(USER_ROLES.USER),validateRequest(ExperienceValidation.updateExperienceZodSchema), ExperienceController.updatedExperience)
+router.put('/:id',auth(),validateRequest(ExperienceValidation.updateExperienceZodSchema), ExperienceController.updatedExperience)
 
-router.delete('/:id',auth(USER_ROLES.USER,USER_ROLES.SUPER_ADMIN), ExperienceController.deleteExperience)
+router.delete('/:id',auth(), ExperienceController.deleteExperience)
 
 export const ExperienceRoutes = router;

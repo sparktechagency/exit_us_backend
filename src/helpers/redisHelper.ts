@@ -1,14 +1,10 @@
-import { Redis } from '@upstash/redis'
+import Redis from 'ioredis'
 import config from '../config'
+const client = new Redis({ host: 'localhost', port: 6379 });
 
-const client = new Redis({
-  url: config.redis.url,
-  token: config.redis.token,
-
-})
 
 const set = async (key:any,value:any)=>{
-    await client.set(key, JSON.stringify(value),{ex:30})
+    await client.set(key, JSON.stringify(value),'EX',1000000000000)
 }
 
 const get = async (key:any)=>{

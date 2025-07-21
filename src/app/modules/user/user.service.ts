@@ -33,9 +33,10 @@ const getUserProfileFromDB = async (
 ): Promise<Partial<IUser>> => {
   const { id } = user;
   const isExistUser = await User.isExistUserById(id);
-  if (!isExistUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
-  }
+  // if (!isExistUser) {
+  //   throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  // }
+  // await getUserDataByAggregete(user)
 
   return isExistUser;
 };
@@ -76,10 +77,32 @@ const changeStatusOfUser = async (id:string)=>{
   return user
 }
 
+const userProfileById = async (id:string)=>{
+  const user = await User.findById(id)
+  if(!user) throw new ApiError(StatusCodes.NOT_FOUND, "User not found")
+    
+  return user
+}
+
+
+// const getUserDataByAggregete= async (user:JwtPayload)=>{
+//   const userData = await User.aggregate([
+//     {
+//       $match: {
+//         _id: user.id,
+//       },
+//     }
+//   ])
+//   console.log(userData)
+//   return userData[0]
+// }
+
 export const UserService = {
   createUserToDB,
   getUserProfileFromDB,
   updateProfileToDB,
   getAllUsersFromDB,
-  changeStatusOfUser
+  changeStatusOfUser,
+  userProfileById,
+  // getUserDataByAggregete
 };

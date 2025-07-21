@@ -28,6 +28,7 @@ router
 
 router.route("/:id")
 .patch(auth(USER_ROLES.ADMIN,USER_ROLES.SUPER_ADMIN),UserController.chengeStatus)
+.get(auth(),UserController.userDataById)
 
 
 

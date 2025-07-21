@@ -16,7 +16,7 @@ const topCountersOfWorld = catchAsync(
             data: countries.data,
             pagination:countries.pagination
         }
-        await redisHelper.client.set(url,response,{ex:60})
+        await redisHelper.client.set(url,JSON.stringify(response),"EX",1000000000000)
         sendResponse(res,response )
     }
 )
@@ -33,7 +33,7 @@ const topCountersOfRegions = catchAsync(
             data: countries.data,
             pagination:countries.pagination
         }
-        await redisHelper.client.set(url,response,{ex:60})
+        await redisHelper.client.set(url,JSON.stringify(response),"EX",1000000000000)
         sendResponse(res,response )
     }
 )

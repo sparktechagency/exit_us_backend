@@ -9,12 +9,12 @@ import fileUploadHandler from '../../middlewares/fileUploadHandler';
 
 const router = express.Router();
 
-router.post('/',auth(USER_ROLES.USER),fileUploadHandler(),validateRequest(AdviceValidation.createAdviceValidationZodSchema),AdviceController.createAdvice)
+router.post('/',auth(),fileUploadHandler(),validateRequest(AdviceValidation.createAdviceValidationZodSchema),AdviceController.createAdvice)
 
 router.get('/:id',tempAuth(), AdviceController.getAdvice)
 
-router.put('/:id',auth(USER_ROLES.USER),validateRequest(AdviceValidation.updateAdviceValidationZodSchema), AdviceController.updateAdvice)
+router.put('/:id',auth(),validateRequest(AdviceValidation.updateAdviceValidationZodSchema), AdviceController.updateAdvice)
 
-router.delete('/:id',auth(USER_ROLES.USER,USER_ROLES.SUPER_ADMIN), AdviceController.deleteAdvice)
+router.delete('/:id',auth(), AdviceController.deleteAdvice)
 
 export const AdviceRoutes = router;
